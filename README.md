@@ -6,6 +6,33 @@ A Pokemon-style JRPG educational simulation game based on **Cognitive Behavioral
 
 **Engine:** Godot 4.4 | **Language:** GDScript | **Resolution:** 640x480 pixel art
 
+<p align="center">
+  <img src="docs/images/main.png" alt="Main Menu" width="400"/>
+</p>
+
+---
+
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><b>Game World</b></td>
+    <td align="center"><b>Therapy Dialogue</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/1.png" alt="Game World" width="400"/></td>
+    <td><img src="docs/images/dialog.png" alt="Dialogue" width="400"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Score Report</b></td>
+    <td align="center"><b>Skill Tree</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/evaluate.png" alt="Score Report" width="400"/></td>
+    <td><img src="docs/images/skill_tree.png" alt="Skill Tree" width="400"/></td>
+  </tr>
+</table>
+
 ---
 
 ## Table of Contents

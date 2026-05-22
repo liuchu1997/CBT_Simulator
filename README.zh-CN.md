@@ -6,6 +6,33 @@
 
 **引擎：** Godot 4.4 · **语言：** GDScript · **分辨率：** 640×480 像素风
 
+<p align="center">
+  <img src="docs/images/main.png" alt="主菜单" width="400"/>
+</p>
+
+---
+
+## 游戏截图
+
+<table>
+  <tr>
+    <td align="center"><b>游戏画面</b></td>
+    <td align="center"><b>治疗对话</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/1.png" alt="游戏画面" width="400"/></td>
+    <td><img src="docs/images/dialog.png" alt="治疗对话" width="400"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>评分报告</b></td>
+    <td align="center"><b>技能树</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/evaluate.png" alt="评分报告" width="400"/></td>
+    <td><img src="docs/images/skill_tree.png" alt="技能树" width="400"/></td>
+  </tr>
+</table>
+
 ---
 
 ## 目录
