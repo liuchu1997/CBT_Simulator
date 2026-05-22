@@ -1,0 +1,113 @@
+[gd_scene load_steps=2 format=3 uid="uid://bscorerpt001"]
+
+[ext_resource type="Script" path="res://scripts/ui/score_report.gd" id="1_script"]
+
+[node name="ScoreReport" type="Control" groups=["score_report"]]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 60.0
+offset_top = 40.0
+offset_right = -60.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Panel"]
+layout_mode = 2
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+theme_override_constants/separation = 16
+
+[node name="Header" type="VBoxContainer" parent="MarginContainer/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="SessionLabel" type="Label" parent="MarginContainer/Panel/VBoxContainer/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "林小雨 - 第 1 次治疗"
+
+[node name="GradeRow" type="HBoxContainer" parent="MarginContainer/Panel/VBoxContainer/Header"]
+layout_mode = 2
+
+[node name="GradeLabel" type="Label" parent="MarginContainer/Panel/VBoxContainer/Header/GradeRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "A"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/Panel/VBoxContainer/Header/GradeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TotalLabel" type="Label" parent="MarginContainer/Panel/VBoxContainer/Header/GradeRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "总分: 100"
+horizontal_alignment = 2
+
+[node name="ScoreSection" type="VBoxContainer" parent="MarginContainer/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/Panel/VBoxContainer/ScoreSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "评分明细"
+
+[node name="ScoreBars" type="VBoxContainer" parent="MarginContainer/Panel/VBoxContainer/ScoreSection"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="FeedbackSection" type="VBoxContainer" parent="MarginContainer/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/Panel/VBoxContainer/FeedbackSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "反馈"
+
+[node name="GoodContainer" type="VBoxContainer" parent="MarginContainer/Panel/VBoxContainer/FeedbackSection"]
+layout_mode = 2
+
+[node name="BadContainer" type="VBoxContainer" parent="MarginContainer/Panel/VBoxContainer/FeedbackSection"]
+layout_mode = 2
+
+[node name="FeedbackText" type="RichTextLabel" parent="MarginContainer/Panel/VBoxContainer/FeedbackSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+bbcode_enabled = true
+
+[node name="ContinueBtn" type="Button" parent="MarginContainer/Panel/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+text = "继续"

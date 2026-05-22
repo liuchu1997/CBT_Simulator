@@ -1,0 +1,86 @@
+[gd_scene load_steps=2 format=3 uid="uid://bchapcomplete01"]
+
+[ext_resource type="Script" path="res://scripts/ui/chapter_complete.gd" id="1_script"]
+
+[node name="ChapterComplete" type="Control" groups=["chapter_complete"]]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.08, 0.15, 0.9)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 30.0
+offset_right = -50.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Panel"]
+layout_mode = 2
+offset_left = 20.0
+offset_top = 16.0
+offset_right = -20.0
+offset_bottom = -16.0
+theme_override_constants/separation = 12
+
+[node name="Header" type="VBoxContainer" parent="MarginContainer/Panel/VBox"]
+layout_mode = 2
+
+[node name="ChapterTitle" type="Label" parent="MarginContainer/Panel/VBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+text = "章节完成"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="MarginContainer/Panel/VBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.5, 1.0, 0.5, 1)
+text = "恭喜！"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/Panel/VBox"]
+layout_mode = 2
+
+[node name="StatsContainer" type="VBoxContainer" parent="MarginContainer/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/Panel/VBox"]
+layout_mode = 2
+
+[node name="UnlockSection" type="VBoxContainer" parent="MarginContainer/Panel/VBox"]
+layout_mode = 2
+
+[node name="UnlockLabel" type="RichTextLabel" parent="MarginContainer/Panel/VBox/UnlockSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 50)
+bbcode_enabled = true
+text = ""
+
+[node name="ContinueBtn" type="Button" parent="MarginContainer/Panel/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+text = "继续 [空格]"

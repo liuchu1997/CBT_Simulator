@@ -1,0 +1,88 @@
+[gd_scene load_steps=2 format=3 uid="uid://bpausemenu001"]
+
+[ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="1_script"]
+
+[node name="PauseMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PausePanel" type="Panel" parent="CenterContainer"]
+custom_minimum_size = Vector2(300, 350)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PausePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PausePanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterContainer/PausePanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "暂停"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="CenterContainer/PausePanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ResumeBtn" type="Button" parent="CenterContainer/PausePanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 40)
+text = "继续游戏"
+
+[node name="MainMenuBtn" type="Button" parent="CenterContainer/PausePanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 40)
+text = "返回主菜单"
+
+[node name="SaveBtn" type="Button" parent="CenterContainer/PausePanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 40)
+text = "保存游戏"
+
+[node name="ResetBtn" type="Button" parent="CenterContainer/PausePanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 40)
+text = "重新开始"
+
+[node name="ResetConfirm" type="Label" parent="CenterContainer/PausePanel/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(1, 0.6, 0.3, 1)
+text = "再按一次确认重置（所有进度将丢失）"
+horizontal_alignment = 1

@@ -1,0 +1,259 @@
+extends Node2D
+
+const FLOOR := Vector2i(0, 0)
+const FLOOR_CARPET := Vector2i(3, 0)
+const FLOOR_BLUE := Vector2i(4, 0)
+const WALL := Vector2i(0, 1)
+const WALL_BORDER := Vector2i(1, 1)
+const WALL_WHITE := Vector2i(2, 1)
+const DOOR := Vector2i(0, 2)
+const DOOR_BODY := Vector2i(1, 2)
+const DESK := Vector2i(1, 3)
+const CHAIR := Vector2i(3, 3)
+const BOOKSHELF := Vector2i(6, 3)
+const PLANT := Vector2i(7, 3)
+const WINDOW := Vector2i(0, 4)
+
+const MW := 40
+const MH := 30
+
+@onready var floor_map: TileMap = $FloorMap
+@onready var wall_map: TileMap = $WallMap
+@onready var player: CharacterBody2D = $Player
+@onready var hud_task: RichTextLabel = $HUD/TaskLabel
+@onready var hud_hint: Label = $HUD/InteractHint
+@onready var emotion_anger: Node2D = $EmotionAnger
+@onready var emotion_sadness: Node2D = $EmotionSadness
+@onready var emotion_fear: Node2D = $EmotionFear
+@onready var emotion_joy: Node2D = $EmotionJoy
+
+var _first_interact_done := false
+var _chapter_fail_reason := ""
+
+func _ready():
+	var ts := _build_tileset()
+	floor_map.tile_set = ts
+	wall_map.tile_set = ts
+	_paint_floor()
+	_paint_walls()
+	_reposition_characters()
+	_setup_task_system()
+	_update_task()
+	_setup_camera()
+
+func _setup_camera():
+	var cam: Camera2D = player.get_node_or_null("Camera2D")
+	if cam:
+		cam.limit_left = 0
+		cam.limit_top = 0
+		cam.limit_right = MW * 16
+		cam.limit_bottom = MH * 16
+		cam.zoom = Vector2(2.0, 2.0)
+
+func _setup_task_system():
+	GameManager.session_ended.connect(_on_session_ended)
+	GameManager.patient_unlocked.connect(_on_patient_unlocked)
+	GameManager.chapter_completed.connect(_on_chapter_completed)
+	GameManager.chapter_failed.connect(_on_chapter_failed)
+	GameManager.score_updated.connect(_on_score_updated)
+	if RoomManager:
+		RoomManager.room_changed.connect(_on_room_changed)
+
+func _on_room_changed(room_id: String):
+	if RoomManager:
+		var config: Dictionary = RoomManager.get_room_config(room_id)
+		var bg_color: Color = config.get("bg_color", Color(0.15, 0.15, 0.2))
+		var bg_node := get_node_or_null("Background")
+		if bg_node and bg_node is ColorRect:
+			bg_node.color = bg_color
+	_update_task()
+
+func _on_session_ended(_pid: String, _snum: int):
+	_first_interact_done = true
+	_update_task()
+
+func _on_patient_unlocked(_pid: String):
+	_update_task()
+
+func _on_chapter_completed(_chapter_id: String):
+	_chapter_fail_reason = ""
+	_update_task()
+
+func _on_chapter_failed(_chapter_id: String, reason: String):
+	_chapter_fail_reason = reason
+	_update_task()
+
+func _on_score_updated(_pid: String):
+	_update_task()
+
+func _update_task():
+	hud_task.visible = true
+	var level := GameManager.therapist_level
+	var score := GameManager.total_score
+	var chapter_title: String = GameManager.get_current_chapter_title()
+	var header := "[b]Lv.%d[/b] | %s | 总分: %d | 技能点: %d" % [level, chapter_title, score, GameManager.skill_points]
+	if RoomManager and RoomManager.get_current_room() != "lobby":
+		header += " | [%s]" % RoomManager.get_room_name(RoomManager.get_current_room())
+	
+	if not _first_interact_done:
+		hud_task.text = header + "\n[b]操作:[/b] WASD移动 | 空格对话 | K技能树 | J日志 | ESC暂停\n[b]任务:[/b] 走近角色，按空格对话"
+		return
+	
+	var lin_progress := GameManager.get_patient_progress("lin_xiaoyu")
+	var zhang_unlocked := GameManager.is_patient_unlocked("zhang_hao")
+	var wang_unlocked := GameManager.is_patient_unlocked("wang_mei")
+	
+	var task := ""
+	var cur_ch := GameManager.current_chapter
+	var cur_def: Dictionary = GameManager.get_chapter_def(cur_ch)
+	
+	if _chapter_fail_reason != "":
+		var fail_ch_title: String = cur_def.get("title", "当前章节")
+		task = "[color=red][b]⚠ 章节未通过: %s[/b][/color]\n" % _chapter_fail_reason
+		task += "[color=yellow]补救方法: 再次与患者对话进行新的治疗，争取更好的评分。\n"
+		task += "提示: 使用共情、倾听类技能在患者防御时更有效；认知重构类在患者反思时更有效。\n"
+		task += "按 K 键查看技能树，了解当前技能等级。[/color]"
+	elif cur_def.is_empty():
+		task = "[b]任务:[/b] 探索诊室，与角色对话"
+	else:
+		var pid: String = cur_def.get("patient_id", "")
+		var needed: int = cur_def.get("required_sessions", 3)
+		var progress: int = GameManager.get_patient_progress(pid)
+		var min_grade: String = cur_def.get("min_grade", "D")
+		var skill_reqs_met := GameManager.meets_skill_requirements(cur_ch)
+		
+		if not skill_reqs_met:
+			var missing: String = GameManager.get_missing_skills_text(cur_ch)
+			task = "[b]任务:[/b] 提升技能以解锁%s:\n%s\n（按K键升级技能）" % [cur_def.get("title", ""), missing]
+		elif pid == "final_review":
+			task = "[b]任务:[/b] 准备迎接最终挑战！"
+		elif progress >= needed:
+			task = "[b]任务:[/b] %s 治疗完成！章节评级要求: %s级以上" % [cur_def.get("title", ""), min_grade]
+		elif progress == 0:
+			var patient_names := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
+			var pname: String = patient_names.get(pid, pid)
+			task = "[b]任务:[/b] 前往找到%s，按空格开始治疗 (%d/%d次)\n章节要求: %s级以上" % [pname, progress, needed, min_grade]
+		else:
+			var patient_names := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
+			var pname: String = patient_names.get(pid, pid)
+			task = "[b]任务:[/b] 再次与%s对话，继续治疗 (%d/%d次)\n章节要求: %s级以上" % [pname, progress, needed, min_grade]
+	
+	hud_task.text = header + "\n" + task
+
+func _build_tileset() -> TileSet:
+	var ts := TileSet.new()
+	ts.tile_size = Vector2i(16, 16)
+	
+	var source := TileSetAtlasSource.new()
+	source.texture = load("res://assets/sprites/tilesets/indoor.png")
+	source.texture_region_size = Vector2i(16, 16)
+	source.separation = Vector2i(0, 0)
+	source.margins = Vector2i(0, 0)
+	
+	ts.add_source(source, 0)
+	ts.add_physics_layer()
+	ts.set_physics_layer_collision_layer(0, 4)
+	
+	var all_used := {
+		FLOOR: true, FLOOR_CARPET: true, FLOOR_BLUE: true,
+		WALL: true, WALL_BORDER: true, WALL_WHITE: true,
+		DOOR: true, DOOR_BODY: true,
+		DESK: true, CHAIR: true, BOOKSHELF: true, PLANT: true, WINDOW: true,
+	}
+	for coords in all_used:
+		source.create_tile(coords)
+	
+	var solid_tiles := [WALL, WALL_BORDER, WALL_WHITE, DESK, BOOKSHELF]
+	for coords in solid_tiles:
+		var data: TileData = source.get_tile_data(coords, 0)
+		if data:
+			data.add_collision_polygon(0)
+			data.set_collision_polygon_points(0, 0, PackedVector2Array([
+				Vector2(0, 0), Vector2(16, 0), Vector2(16, 16), Vector2(0, 16)
+			]))
+	
+	return ts
+
+func _paint_floor():
+	for x in range(MW):
+		for y in range(MH):
+			if x == 0 or x == MW - 1 or y == 0 or y == MH - 1:
+				continue
+			if x >= 1 and x <= 18 and y >= 1 and y <= 13:
+				floor_map.set_cell(0, Vector2i(x, y), 0, FLOOR_CARPET)
+			elif x >= 21 and x <= MW - 2 and y >= 1 and y <= 13:
+				floor_map.set_cell(0, Vector2i(x, y), 0, FLOOR_BLUE)
+			else:
+				floor_map.set_cell(0, Vector2i(x, y), 0, FLOOR)
+
+func _paint_walls():
+	for x in range(MW):
+		wall_map.set_cell(0, Vector2i(x, 0), 0, WALL_BORDER)
+		wall_map.set_cell(0, Vector2i(x, MH - 1), 0, WALL_BORDER)
+	for y in range(MH):
+		wall_map.set_cell(0, Vector2i(0, y), 0, WALL)
+		wall_map.set_cell(0, Vector2i(MW - 1, y), 0, WALL)
+	
+	for y in range(1, 14):
+		wall_map.set_cell(0, Vector2i(19, y), 0, WALL)
+		wall_map.set_cell(0, Vector2i(20, y), 0, WALL)
+	for y in range(7, 9):
+		wall_map.set_cell(0, Vector2i(19, y), -1)
+		wall_map.set_cell(0, Vector2i(20, y), -1)
+	
+	for x in range(1, MW - 1):
+		wall_map.set_cell(0, Vector2i(x, 14), 0, WALL)
+	for x in range(8, 12):
+		wall_map.set_cell(0, Vector2i(x, 14), -1)
+	for x in range(28, 32):
+		wall_map.set_cell(0, Vector2i(x, 14), -1)
+	
+	for x in range(15, 25):
+		wall_map.set_cell(0, Vector2i(x, MH - 1), -1)
+	
+	_furniture_room_a()
+	_furniture_room_b()
+	_furniture_lobby()
+	_windows()
+	_decorations()
+
+func _furniture_room_a():
+	wall_map.set_cell(0, Vector2i(3, 3), 0, DESK)
+	wall_map.set_cell(0, Vector2i(4, 3), 0, DESK)
+	wall_map.set_cell(0, Vector2i(3, 4), 0, CHAIR)
+	wall_map.set_cell(0, Vector2i(16, 1), 0, BOOKSHELF)
+	wall_map.set_cell(0, Vector2i(17, 1), 0, BOOKSHELF)
+
+func _furniture_room_b():
+	wall_map.set_cell(0, Vector2i(24, 3), 0, DESK)
+	wall_map.set_cell(0, Vector2i(25, 3), 0, DESK)
+	wall_map.set_cell(0, Vector2i(24, 4), 0, CHAIR)
+	wall_map.set_cell(0, Vector2i(35, 1), 0, BOOKSHELF)
+	wall_map.set_cell(0, Vector2i(36, 1), 0, BOOKSHELF)
+
+func _furniture_lobby():
+	wall_map.set_cell(0, Vector2i(5, 19), 0, DESK)
+	wall_map.set_cell(0, Vector2i(6, 19), 0, DESK)
+	wall_map.set_cell(0, Vector2i(33, 19), 0, DESK)
+	wall_map.set_cell(0, Vector2i(34, 19), 0, DESK)
+	
+	# Place emotion NPCs in lobby
+	$EmotionAnger.position = Vector2(8 * 16, 20 * 16)
+	$EmotionSadness.position = Vector2(14 * 16, 20 * 16)
+	$EmotionFear.position = Vector2(26 * 16, 20 * 16)
+	$EmotionJoy.position = Vector2(32 * 16, 20 * 16)
+
+func _windows():
+	for x in [4, 5, 12, 13, 26, 27, 34, 35]:
+		wall_map.set_cell(0, Vector2i(x, 0), 0, WINDOW)
+
+func _decorations():
+	for pos in [Vector2i(2, 2), Vector2i(37, 2), Vector2i(2, 27), Vector2i(37, 27)]:
+		wall_map.set_cell(0, pos, 0, PLANT)
+
+func _reposition_characters():
+	$Player.position = Vector2(20 * 16, 22 * 16)
+	$LinXiaoyu.position = Vector2(10 * 16, 8 * 16)
+	$ZhangHao.position = Vector2(30 * 16, 8 * 16)
+	$WangMei.position = Vector2(10 * 16, 18 * 16)
+	$Receptionist.position = Vector2(20 * 16, 24 * 16)

@@ -1,0 +1,73 @@
+[gd_scene load_steps=2 format=3 uid="uid://bskilltree001"]
+
+[ext_resource type="Script" path="res://scripts/ui/skill_tree_ui.gd" id="1_script"]
+
+[node name="SkillTreeUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 30.0
+offset_right = -40.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SkillPanel" type="Panel" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/SkillPanel"]
+layout_mode = 2
+offset_left = 16.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = -12.0
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="MarginContainer/SkillPanel/VBox"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/SkillPanel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "CBT 技能树"
+
+[node name="PointsLabel" type="Label" parent="MarginContainer/SkillPanel/VBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+text = "技能点: 0"
+
+[node name="CloseBtn" type="Button" parent="MarginContainer/SkillPanel/VBox/Header"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+text = "关闭"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/SkillPanel/VBox"]
+layout_mode = 2
+
+[node name="Columns" type="HBoxContainer" parent="MarginContainer/SkillPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20

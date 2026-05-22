@@ -1,0 +1,123 @@
+[gd_scene load_steps=2 format=3 uid="uid://bpatprofui001"]
+
+[ext_resource type="Script" path="res://scripts/ui/patient_profile_ui.gd" id="1_script"]
+
+[node name="PatientProfileUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="CenterContainer"]
+custom_minimum_size = Vector2(400, 500)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "患者姓名"
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DiagLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "诊断"
+
+[node name="HSep0" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="EmotionSection" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SectionTitle" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/EmotionSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "情绪状态"
+
+[node name="EmotionBars" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/EmotionSection"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HSep1" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="DistortionSection" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SectionTitle" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/DistortionSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "认知扭曲"
+
+[node name="DistortionsLabel" type="RichTextLabel" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/DistortionSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+bbcode_enabled = true
+
+[node name="HSep2" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SessionSection" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SectionTitle" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/SessionSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "治疗记录"
+
+[node name="SessionLabel" type="RichTextLabel" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/SessionSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 80)
+bbcode_enabled = true
+
+[node name="CloseBtn" type="Button" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 36)
+text = "关闭"

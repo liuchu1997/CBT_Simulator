@@ -1,0 +1,90 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/battle_hud.gd" id="1_script"]
+
+[node name="BattleHUD" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 180.0
+offset_bottom = 260.0
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="PatientName" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "患者"
+
+[node name="AllianceRow" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="AllianceTitle" type="Label" parent="Panel/MarginContainer/VBoxContainer/AllianceRow"]
+layout_mode = 2
+text = "治疗联盟"
+
+[node name="AllianceBar" type="ProgressBar" parent="Panel/MarginContainer/VBoxContainer/AllianceRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 14)
+max_value = 100.0
+value = 20.0
+show_percentage = false
+
+[node name="AllianceLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer/AllianceRow"]
+layout_mode = 2
+text = "20/100"
+
+[node name="StateRow" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StateTitle" type="Label" parent="Panel/MarginContainer/VBoxContainer/StateRow"]
+layout_mode = 2
+text = "情绪:"
+
+[node name="StateValue" type="Label" parent="Panel/MarginContainer/VBoxContainer/StateRow"]
+layout_mode = 2
+text = "防御"
+
+[node name="TurnRow" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TurnTitle" type="Label" parent="Panel/MarginContainer/VBoxContainer/TurnRow"]
+layout_mode = 2
+text = "回合:"
+
+[node name="TurnValue" type="Label" parent="Panel/MarginContainer/VBoxContainer/TurnRow"]
+layout_mode = 2
+text = "0"
+
+[node name="HSeparator" type="HSeparator" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StatsContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="EffectLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = ""
+
+[node name="SchemaLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = ""

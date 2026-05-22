@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/room_base.gd" id="1_script"]
+
+[node name="RoomPersonality" type="Node2D"]
+script = ExtResource("1_script")
+room_id = "room_personality"
+room_name = "人格系诊室"
+bg_color = Color(0.18, 0.12, 0.18, 1)
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_right = 640.0
+offset_bottom = 480.0
+color = Color(0.18, 0.12, 0.18, 1)
+
+[node name="RoomLabel" type="Label" parent="."]
+offset_left = 220.0
+offset_top = 8.0
+offset_right = 420.0
+offset_bottom = 28.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.8, 0.6, 0.8, 1)
+text = "— 人格系诊室 —"
+horizontal_alignment = 1
+
+[node name="Description" type="RichTextLabel" parent="."]
+offset_left = 120.0
+offset_top = 40.0
+offset_right = 520.0
+offset_bottom = 120.0
+bbcode_enabled = true
+text = "[color=gray]紫色调的安静房间。镜子和白板用于图式分析和归因训练。空气中有淡淡的薰衣草香。[/color]"
+fit_content = true

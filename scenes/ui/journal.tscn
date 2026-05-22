@@ -1,0 +1,105 @@
+[gd_scene load_steps=2 format=3 uid="uid://bjournalui001"]
+
+[ext_resource type="Script" path="res://scripts/ui/journal_ui.gd" id="1_script"]
+
+[node name="JournalUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 20.0
+offset_right = -30.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="JournalPanel" type="Panel" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/JournalPanel"]
+layout_mode = 2
+offset_left = 16.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = -12.0
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="MarginContainer/JournalPanel/VBox"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/JournalPanel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "治疗日志"
+
+[node name="SessionCount" type="Label" parent="MarginContainer/JournalPanel/VBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "治疗次数: 0"
+
+[node name="CloseBtn" type="Button" parent="MarginContainer/JournalPanel/VBox/Header"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+text = "关闭[J]"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/JournalPanel/VBox"]
+layout_mode = 2
+
+[node name="Body" type="HBoxContainer" parent="MarginContainer/JournalPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="EntryList" type="VBoxContainer" parent="MarginContainer/JournalPanel/VBox/Body"]
+layout_mode = 2
+custom_minimum_size = Vector2(220, 0)
+size_flags_stretch_ratio = 0.45
+
+[node name="DetailPanel" type="Panel" parent="MarginContainer/JournalPanel/VBox/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/JournalPanel/VBox/Body/DetailPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DetailText" type="RichTextLabel" parent="MarginContainer/JournalPanel/VBox/Body/DetailPanel/MarginContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "选择一条记录查看详情"
+
+[node name="StrategiesLabel" type="Label" parent="MarginContainer/JournalPanel/VBox/Body"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+text = "已学策略: 0个"

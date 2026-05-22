@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/room_base.gd" id="1_script"]
+
+[node name="RoomAnxiety" type="Node2D"]
+script = ExtResource("1_script")
+room_id = "room_anxiety"
+room_name = "焦虑系诊室"
+bg_color = Color(0.2, 0.15, 0.12, 1)
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_right = 640.0
+offset_bottom = 480.0
+color = Color(0.2, 0.15, 0.12, 1)
+
+[node name="RoomLabel" type="Label" parent="."]
+offset_left = 220.0
+offset_top = 8.0
+offset_right = 420.0
+offset_bottom = 28.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.9, 0.7, 0.5, 1)
+text = "— 焦虑系诊室 —"
+horizontal_alignment = 1
+
+[node name="Description" type="RichTextLabel" parent="."]
+offset_left = 120.0
+offset_top = 40.0
+offset_right = 520.0
+offset_bottom = 120.0
+bbcode_enabled = true
+text = "[color=gray]温暖的橙色调房间。墙上挂着呼吸练习的图表。角落里有一个沙袋——行为激活的好帮手。[/color]"
+fit_content = true
