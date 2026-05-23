@@ -12,6 +12,7 @@ extends Control
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	add_to_group("overlay_ui")
 	continue_btn.pressed.connect(_on_continue)
 	visible = false
 
@@ -113,9 +114,13 @@ func show_report(data: Dictionary, on_closed: Callable = Callable()):
 	continue_btn.grab_focus()
 
 func _add_chapter_hint(text: String):
-	var label := Label.new()
+	var label := RichTextLabel.new()
+	label.bbcode_enabled = true
 	label.text = text
-	label.add_theme_font_size_override("font_size", 12)
+	label.fit_content = true
+	label.scroll_following = false
+	label.custom_minimum_size.y = 20
+	label.add_theme_font_size_override("normal_font_size", 12)
 	feedback_label.get_parent().add_child(label)
 
 func _on_continue():

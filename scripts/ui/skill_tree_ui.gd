@@ -8,6 +8,7 @@ extends Control
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	add_to_group("overlay_ui")
 	visible = false
 	close_btn.pressed.connect(_on_close)
 	SkillTree.skill_upgraded.connect(_on_skill_upgraded)
@@ -17,10 +18,19 @@ func _input(event: InputEvent):
 		return
 	if DialogueManager.is_active():
 		return
+	if _other_overlay_visible():
+		return
 	if visible:
 		_close()
 	else:
 		_open()
+
+func _other_overlay_visible() -> bool:
+	var nodes := get_tree().get_nodes_in_group("overlay_ui")
+	for n in nodes:
+		if n != self and n is Control and n.visible:
+			return true
+	return false
 
 func _open():
 	visible = true

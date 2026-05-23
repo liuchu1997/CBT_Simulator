@@ -10,32 +10,33 @@ signal closed
 @onready var close_btn: Button = $CenterContainer/Panel/MarginContainer/VBoxContainer/CloseBtn
 
 var _current_patient: Node = null
+var _patient_index: int = 0
 
 func _ready():
+	add_to_group("ui")
+	add_to_group("overlay_ui")
 	visible = false
 	close_btn.pressed.connect(func():
 		visible = false
-		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 		closed.emit()
 	)
 
 func toggle_patient_profile():
 	if visible:
 		visible = false
-		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 		return
 	
 	var patient_nodes := get_tree().get_nodes_in_group("patient")
 	if patient_nodes.is_empty():
 		return
 	
-	_current_patient = patient_nodes[0]
+	_patient_index = (_patient_index + 1) % patient_nodes.size()
+	_current_patient = patient_nodes[_patient_index]
 	if _current_patient:
 		show_profile(_current_patient)
 
 func show_profile(patient: Node):
 	visible = true
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	
 	var p_id: String = patient.get("patient_id") if patient.get("patient_id") else ""
 	var p_name: String = patient.get("npc_name") if patient.get("npc_name") else "未知"
@@ -97,4 +98,3 @@ func show_profile(patient: Node):
 func _input(event: InputEvent):
 	if visible and event.is_action_pressed("ui_cancel"):
 		visible = false
-		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)

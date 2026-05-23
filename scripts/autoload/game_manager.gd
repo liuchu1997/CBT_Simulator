@@ -12,6 +12,9 @@ signal tutorial_trigger(tutorial_id: String)
 signal game_reset
 signal chapter_failed(chapter_id: String, reason: String)
 
+const PATIENT_NAMES := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
+const BOND_DEFAULTS := {"lin_xiaoyu": 30, "zhang_hao": 25, "wang_mei": 20}
+
 var current_patient_id: String = ""
 var current_session_num: int = 0
 var game_state: String = "menu"
@@ -142,7 +145,7 @@ func get_chapter_status_text() -> String:
 func reset_patient_progress(patient_id: String):
 	completed_sessions[patient_id] = 0
 	patient_scores.erase(patient_id)
-	var bond_default := {"lin_xiaoyu": 30, "zhang_hao": 25, "wang_mei": 20}
+	var bond_default := BOND_DEFAULTS
 	patient_bond[patient_id] = bond_default.get(patient_id, 20)
 	if BattleEngine:
 		BattleEngine.reset_patient(patient_id)
@@ -161,7 +164,10 @@ func reset_patient_progress(patient_id: String):
 	for i in range(target_idx, chapter_order.size()):
 		completed_chapters.erase(chapter_order[i])
 	
+	_last_failed_chapter = ""
 	current_chapter = target_chapter
+
+var _last_failed_chapter: String = ""
 
 func check_chapter_completion() -> bool:
 	var def: Dictionary = _chapter_defs.get(current_chapter, {})
@@ -200,9 +206,12 @@ func check_chapter_completion() -> bool:
 			var g: String = s_data.get("grade", "D")
 			if grade_order.find(g) < grade_order.find(worst_g):
 				worst_g = g
-		chapter_failed.emit(current_chapter, "需要%s级以上，有治疗评级为%s级" % [min_g, worst_g])
+		if _last_failed_chapter != current_chapter:
+			_last_failed_chapter = current_chapter
+			chapter_failed.emit(current_chapter, "需要%s级以上，有治疗评级为%s级" % [min_g, worst_g])
 		return false
 	
+	_last_failed_chapter = ""
 	if not completed_chapters.has(current_chapter):
 		completed_chapters.append(current_chapter)
 		chapter_completed.emit(current_chapter)
@@ -260,7 +269,7 @@ func is_patient_unlocked(patient_id: String) -> bool:
 func get_bond(patient_id: String) -> int:
 	if patient_bond.has(patient_id):
 		return patient_bond[patient_id]
-	var defaults := { "lin_xiaoyu": 30, "zhang_hao": 25, "wang_mei": 20 }
+	var defaults := BOND_DEFAULTS
 	return defaults.get(patient_id, 20)
 
 func modify_bond(patient_id: String, amount: int):
@@ -278,6 +287,7 @@ func modify_bond(patient_id: String, amount: int):
 	bond_changed.emit(patient_id, new_val)
 
 func check_bond_decay():
+	var to_decay: Array[String] = []
 	for pid in patient_bond:
 		if completed_sessions.has(pid):
 			var last_session: int = completed_sessions[pid]
@@ -286,7 +296,9 @@ func check_bond_decay():
 				if v > current_max:
 					current_max = v
 			if current_max - last_session >= 3 and patient_bond[pid] > 10:
-				modify_bond(pid, -2)
+				to_decay.append(pid)
+	for pid in to_decay:
+		modify_bond(pid, -2)
 
 func get_bond_level(patient_id: String) -> String:
 	var b := get_bond(patient_id)

@@ -91,10 +91,10 @@ func select_choice(index: int):
 		if pts > 0:
 			var bond_mod: int = mini(pts, 5) + SkillTree.get_bond_bonus()
 			GameManager.modify_bond(pid, bond_mod)
-			CbtTutorial._on_trigger("first_good_choice")
+			GameManager.tutorial_trigger.emit("first_good_choice")
 		elif pts < 0:
 			GameManager.modify_bond(pid, maxi(pts, -5))
-			CbtTutorial._on_trigger("first_bad_choice")
+			GameManager.tutorial_trigger.emit("first_bad_choice")
 	
 	if choice.has("next"):
 		_jump_to(choice["next"])

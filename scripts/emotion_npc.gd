@@ -75,8 +75,6 @@ func _start_teaching():
 		var is_correct: bool = c.get("correct", false)
 		choices_for_dialogue.append({
 			"text": c.get("text", ""),
-			"score_category": "cognitive_restructuring",
-			"score_points": 2 if is_correct else -1,
 			"feedback": c.get("explain", ""),
 			"id": "emotion_%s_c%d" % [emotion_type, i],
 		})

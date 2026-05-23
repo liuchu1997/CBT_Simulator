@@ -190,7 +190,7 @@ func _start_session():
 func _on_session_ended():
 	var result := ScoringSystem.evaluate_session()
 	result["patient_name"] = npc_name
-	result["session_num"] = GameManager.get_patient_progress(patient_id)
+	result["session_num"] = GameManager.current_session_num
 	GameManager.end_session(result)
 	_update_expression()
 	CbtTutorial._on_trigger("first_score")
@@ -204,8 +204,7 @@ func _on_session_ended():
 		report_ui.show_report(result, _on_report_closed)
 
 func _on_report_closed():
-	var chapter_done: bool = GameManager.check_chapter_completion()
-	if chapter_done:
+	if GameManager.is_chapter_completed(GameManager.current_chapter):
 		await get_tree().create_timer(0.05).timeout
 		var cc_ui := get_tree().get_first_node_in_group("chapter_complete")
 		if cc_ui and cc_ui.has_method("show_chapter_complete"):
@@ -472,9 +471,8 @@ func _wang_dialogue(s: int) -> Array[Dictionary]:
 				]
 			})
 			d.append({"label": "wang_s1_resp1_example", "speaker": "王美", "text": "比如上周项目延期了，虽然整个团队都有责任，但我就觉得主要是我的错..."})
-			d.append({"label": "wang_s1_resp1_personal", "speaker": "王美", "text": "...公平？也许不公平吧。但我就是控制不住，一出事就先怪自己。比如上周项目延期..."})
-			d.append({"label": "wang_s1_resp1_dismiss", "speaker": "王美", "text": "（有些无奈）我知道这样不好...但我改不了啊。一有事情出错我就条件反射地怪自己..."})
-			d.append({"speaker": "王美", "text": "比如上周项目延期了，虽然整个团队都有责任，但我就觉得主要是我的错..."})
+			d.append({"label": "wang_s1_resp1_personal", "speaker": "王美", "text": "...公平？也许不公平吧。但我就是控制不住，一出事就先怪自己。比如上周项目延期了，虽然整个团队都有责任，但我就觉得主要是我的错..."})
+			d.append({"label": "wang_s1_resp1_dismiss", "speaker": "王美", "text": "（有些无奈）我知道这样不好...但我改不了啊。一有事情出错我就条件反射地怪自己。比如上周项目延期了，虽然整个团队都有责任，但我就觉得主要是我的错..."})
 			d.append({"speaker": "王美", "text": _bond_text(
 				"（犹豫地）你觉得...这不全是我的错？",
 				"（思考着）也许确实不全是我的责任...但要怎么分清呢？",
@@ -495,6 +493,66 @@ func _wang_dialogue(s: int) -> Array[Dictionary]:
 				"（恍然大悟）我确实对自己太苛刻了。谢谢你的提醒。",
 				"（微笑）我又学到了一个新方法。下次再出现这种想法的时候，我会用双标准来检查。"
 			)})
+		2:
+			d.append({"speaker": "王美", "text": "%s我又来了。这周我试着你说的方法，遇到事情先不急着怪自己。" % prefix})
+			d.append({"speaker": "王美", "text": _bond_text(
+				"不过...昨天同事在群里发了条消息，我回复了之后没人理我。我立刻就想'是不是我说错话了，大家都讨厌我了'。",
+				"我昨天遇到了一件事——同事在群里发了消息，我回复后没人理我。我第一反应又是'我是不是说错话了'。",
+				"昨天我遇到了类似的情况——群里没人回我。但我这次停下来了，没有立刻怪自己。"
+			)})
+			d.append({
+				"choices": [
+					{"text": "你停下来了这个过程——这本身就是一个很大的进步。然后呢？", "score_category": "active_listening", "score_points": 3, "feedback": "肯定进步并引导继续探索", "id": "wang_s2_acknowledge", "next": "wang_s2_resp1_ack"},
+					{"text": "我们来检验一下：'没人理我'可能有哪些原因？", "score_category": "socratic_questioning", "score_points": 4, "feedback": "引导多因分析，对抗个人化", "id": "wang_s2_check", "next": "wang_s2_resp1_check"},
+					{"text": "别太在意群消息，这不重要。", "score_category": "rapport", "score_points": -2, "feedback": "轻视患者感受，未引导反思", "id": "wang_s2_dismiss", "next": "wang_s2_resp1_dismiss"},
+				]
+			})
+			d.append({"label": "wang_s2_resp1_ack", "speaker": "王美", "text": "（有些自豪）嗯！然后我问自己：'如果是小丽发了同样的消息没人回，我会觉得她讨厌人吗？'答案是不会。"})
+			d.append({"label": "wang_s2_resp1_check", "speaker": "王美", "text": "原因...可能是大家都在忙？或者消息被刷上去了？嗯，仔细想想，群消息确实经常被忽略的。"})
+			d.append({"label": "wang_s2_resp1_dismiss", "speaker": "王美", "text": "（有些委屈）对你来说不重要，但对我来说，那种被忽视的感觉很真实..."})
+			d.append({"speaker": "王美", "text": _bond_text(
+				"你说得对，我好像开始能跳出'都是我的错'的模式了。",
+				"双标准技术真的好用。我现在能更快地发现自己在个人化了。",
+				"我发现很多时候真的不是我的问题。这种认识让我轻松了很多。"
+			)})
+			d.append({
+				"choices": [
+					{"text": "你已经在用双标准技术了！想不想试试把它变成一个日常习惯？", "score_category": "cognitive_restructuring", "score_points": 4, "feedback": "巩固认知行为改变，引导习惯化", "id": "wang_s2_habit", "next": "wang_s2_resp2_habit"},
+					{"text": "你觉得这种'什么都怪自己'的模式，是从什么时候开始的？", "score_category": "socratic_questioning", "score_points": 3, "feedback": "深入探索归因模式的历史根源", "id": "wang_s2_origin", "next": "wang_s2_resp2_origin"},
+					{"text": "你做得很好，继续保持就好。", "score_category": "rapport", "score_points": 0, "feedback": "简单鼓励，缺乏深入引导", "id": "wang_s2_simple", "next": "wang_s2_resp2_simple"},
+				]
+			})
+			d.append({"label": "wang_s2_resp2_habit", "speaker": "王美", "text": "日常习惯？嗯...也许我可以在手机上设个提醒，每天晚上问问自己'今天有没有不公平地责备自己？'"})
+			d.append({"label": "wang_s2_resp2_origin", "speaker": "王美", "text": "从什么时候...我想想。大概小时候吧，我妈总说'都是你害的'。也许从那时起我就学会了什么事都往自己身上揽..."})
+			d.append({"label": "wang_s2_resp2_simple", "speaker": "王美", "text": "谢谢...不过有时候我还是会自动怪自己。可能需要更多练习。"})
+			d.append({"speaker": "王美", "text": _bond_text(
+				"（点头）我会继续练习的。下次见。",
+				"（微笑）我觉得我在进步。谢谢你陪我一起找方法。",
+				"（自信地）我已经有了应对的方法。下次遇到类似情况，我知道该怎么做了。"
+			)})
+		3:
+			d.append({"speaker": "王美", "text": "%s我来告诉你一个好消息！" % prefix})
+			d.append({"speaker": "王美", "text": _bond_text(
+				"昨天项目又出问题了。以前我肯定立刻怪自己，但这次...我居然停下来了！",
+				"这周我用你教的方法，在遇到问题时先分析原因，而不是急着自责。效果很明显！",
+				"我现在已经有了一个习惯：遇到问题先问'这真的全是我的错吗？'大部分时候答案都是不是。"
+			)})
+			d.append({
+				"choices": [
+					{"text": "你能描述一下这次是怎么应对的吗？", "score_category": "active_listening", "score_points": 3, "feedback": "引导患者回顾成功策略，强化正面体验", "id": "wang_s3_detail", "next": "wang_s3_resp1_detail"},
+					{"text": "你从'什么都怪自己'到现在能停下来分析——这个转变是怎么发生的？", "score_category": "socratic_questioning", "score_points": 4, "feedback": "促进元认知，让患者理解自己的改变过程", "id": "wang_s3_meta", "next": "wang_s3_resp1_meta"},
+					{"text": "做得不错，继续加油。", "score_category": "rapport", "score_points": 0, "feedback": "简单鼓励，未深入探索", "id": "wang_s3_simple", "next": "wang_s3_resp1_simple"},
+				]
+			})
+			d.append({"label": "wang_s3_resp1_detail", "speaker": "王美", "text": "项目需求又变了，我第一反应还是'是我的错'。但我立刻用双标准问自己——'如果是同事遇到，我会怪她吗？'不会。然后我就冷静下来了。"})
+			d.append({"label": "wang_s3_resp1_meta", "speaker": "王美", "text": "转变...大概是每次你都没有否定我的感受，而是帮我看到其他可能性。慢慢地，我学会了自己做这件事。"})
+			d.append({"label": "wang_s3_resp1_simple", "speaker": "王美", "text": "谢谢！虽然偶尔还是会习惯性地想怪自己，但至少能叫停了。"})
+			d.append({"speaker": "王美", "text": _bond_text(
+				"谢谢你一直以来的耐心。我觉得我不再是什么错都往自己身上揽的人了。",
+				"你的方法真的改变了我。我现在能更公平地看待事情了。",
+				"我觉得我已经掌握了这些工具。以后遇到类似情况，我知道该怎么保护自己了。"
+			)})
+			d.append({"speaker": "王美", "text": "（微笑）我想，我会好起来的。谢谢你。"})
 		_:
 			d.append({"speaker": "王美", "text": "%s最近我在练习你说的方法。" % prefix})
 			if BattleEngine and BattleEngine.get_patient_data("wang_mei").size() > 0:
@@ -531,8 +589,7 @@ func _show_retry_dialogue():
 	for s_data in scores:
 		grades_text += "%s " % s_data.get("grade", "D")
 	
-	var patient_names := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
-	var pname: String = patient_names.get(patient_id, npc_name)
+	var pname: String = GameManager.PATIENT_NAMES.get(patient_id, npc_name)
 	
 	d.append({"speaker": "系统", "text": "【章节未通过】%s的治疗评级未达到要求。" % pname})
 	d.append({"speaker": "系统", "text": "章节要求: 最低%s级\n你的治疗评级: %s" % [min_grade, grades_text]})
@@ -596,11 +653,16 @@ func _show_completion_dialogue():
 func _update_expression():
 	var hope_val: float = emotion.get("hope", 0)
 	var dep_val: float = emotion.get("depression", 50)
+	var anx_val: float = emotion.get("anxiety", 0)
+	if BattleEngine and BattleEngine.get_patient_data(patient_id).size() > 0:
+		hope_val = BattleEngine.get_stat(patient_id, "hope")
+		dep_val = BattleEngine.get_stat(patient_id, "depression")
+		anx_val = BattleEngine.get_stat(patient_id, "anxiety")
 	if hope_val > 60:
 		current_expression = "happy"
 	elif dep_val > 60:
 		current_expression = "sad"
-	elif emotion.get("anxiety", 0) > 60:
+	elif anx_val > 60:
 		current_expression = "anxious"
 	else:
 		current_expression = "normal"

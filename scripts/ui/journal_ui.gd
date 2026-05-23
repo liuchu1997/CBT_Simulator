@@ -11,6 +11,7 @@ extends Control
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	add_to_group("overlay_ui")
 	visible = false
 	close_btn.pressed.connect(_on_close)
 
@@ -19,10 +20,19 @@ func _input(event: InputEvent):
 		return
 	if DialogueManager.is_active():
 		return
+	if _other_overlay_visible():
+		return
 	if visible:
 		_close()
 	else:
 		_open()
+
+func _other_overlay_visible() -> bool:
+	var nodes := get_tree().get_nodes_in_group("overlay_ui")
+	for n in nodes:
+		if n != self and n is Control and n.visible:
+			return true
+	return false
 
 func _open():
 	visible = true
@@ -52,14 +62,9 @@ func _refresh():
 		strategies_label.text = ""
 		return
 	
-	var patient_names := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
-	
-	for i in range(entries.size()):
-		var entry: Dictionary = entries[entries.size() - 1 - i]
-		var btn := Button.new()
-		var pname: String = patient_names.get(entry.get("patient_id", ""), entry.get("patient_id", ""))
-		btn.text = "%s - 第%d次 | %s级 | %d分" % [
-			pname,
+	var pname: String = GameManager.PATIENT_NAMES.get(entry.get("patient_id", ""), entry.get("patient_id", ""))
+	btn.text = "%s - 第%d次 | %s级 | %d分" % [
+		pname,
 			entry.get("session", 0),
 			entry.get("grade", "?"),
 			entry.get("score_total", 0),
@@ -79,8 +84,7 @@ func _show_detail(index: int):
 		return
 	var entry: Dictionary = entries[index]
 	
-	var patient_names := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
-	var pname: String = patient_names.get(entry.get("patient_id", ""), "未知")
+	var pname: String = GameManager.PATIENT_NAMES.get(entry.get("patient_id", ""), "未知")
 	
 	var text := "[b]%s - 第%d次治疗[/b]\n" % [pname, entry.get("session", 0)]
 	text += "评级: %s | 得分: %d\n" % [entry.get("grade", "?"), entry.get("score_total", 0)]

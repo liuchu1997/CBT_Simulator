@@ -22,8 +22,15 @@ func _input(event: InputEvent):
 		return
 	if get_tree().paused:
 		_on_resume()
-	elif not DialogueManager.is_active():
+	elif not DialogueManager.is_active() and not _any_overlay_visible():
 		_pause()
+
+func _any_overlay_visible() -> bool:
+	var nodes := get_tree().get_nodes_in_group("overlay_ui")
+	for n in nodes:
+		if n is Control and n.visible:
+			return true
+	return false
 
 func _pause():
 	_reset_pending = false

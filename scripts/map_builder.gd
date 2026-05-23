@@ -31,6 +31,7 @@ var _first_interact_done := false
 var _chapter_fail_reason := ""
 
 func _ready():
+	$HUD.add_to_group("game_hud")
 	var ts := _build_tileset()
 	floor_map.tile_set = ts
 	wall_map.tile_set = ts
@@ -130,12 +131,10 @@ func _update_task():
 		elif progress >= needed:
 			task = "[b]任务:[/b] %s 治疗完成！章节评级要求: %s级以上" % [cur_def.get("title", ""), min_grade]
 		elif progress == 0:
-			var patient_names := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
-			var pname: String = patient_names.get(pid, pid)
+			var pname: String = GameManager.PATIENT_NAMES.get(pid, pid)
 			task = "[b]任务:[/b] 前往找到%s，按空格开始治疗 (%d/%d次)\n章节要求: %s级以上" % [pname, progress, needed, min_grade]
 		else:
-			var patient_names := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
-			var pname: String = patient_names.get(pid, pid)
+			var pname: String = GameManager.PATIENT_NAMES.get(pid, pid)
 			task = "[b]任务:[/b] 再次与%s对话，继续治疗 (%d/%d次)\n章节要求: %s级以上" % [pname, progress, needed, min_grade]
 	
 	hud_task.text = header + "\n" + task

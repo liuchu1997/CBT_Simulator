@@ -171,8 +171,4 @@ func _eff_color(label: String) -> Color:
 	return Color.WHITE
 
 func _get_patient_display_name(pid: String) -> String:
-	match pid:
-		"lin_xiaoyu": return "林小雨"
-		"zhang_hao": return "张浩"
-		"wang_mei": return "王美"
-		_: return pid
+	return GameManager.PATIENT_NAMES.get(pid, pid)

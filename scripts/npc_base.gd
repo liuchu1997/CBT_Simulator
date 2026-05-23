@@ -49,7 +49,18 @@ func _on_body_exited(body: Node2D):
 		_hide_interact_hint()
 
 func _show_interact_hint():
-	pass
+	var hud_nodes := get_tree().get_nodes_in_group("game_hud")
+	if hud_nodes.is_empty():
+		return
+	var hint_label: Label = hud_nodes[0].get_node_or_null("InteractHint")
+	if hint_label:
+		hint_label.text = "[空格] 互动"
+		hint_label.visible = true
 
 func _hide_interact_hint():
-	pass
+	var hud_nodes := get_tree().get_nodes_in_group("game_hud")
+	if hud_nodes.is_empty():
+		return
+	var hint_label: Label = hud_nodes[0].get_node_or_null("InteractHint")
+	if hint_label:
+		hint_label.visible = false

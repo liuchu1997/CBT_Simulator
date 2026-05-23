@@ -182,6 +182,7 @@ func apply_skill(patient_id: String, category: String, base_points: int) -> Dict
 	var eff_label: String = _get_effectiveness_label(eff)
 	var delta_text: String = "%+d" % alliance_delta
 	
+	data["last_category"] = category
 	_update_secondary_stats(data, category, eff)
 	_check_state_transition(patient_id, data, eff, base_points)
 	_check_schema_discovery(patient_id, data, eff)

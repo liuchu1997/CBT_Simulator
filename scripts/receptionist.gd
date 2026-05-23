@@ -140,8 +140,7 @@ func _get_hint() -> String:
 	var pid: String = ch_def.get("patient_id", "")
 	var progress: int = GameManager.completed_sessions.get(pid, 0)
 	var needed: int = ch_def.get("required_sessions", 3)
-	var patient_names := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
-	var pname: String = patient_names.get(pid, "")
+	var pname: String = GameManager.PATIENT_NAMES.get(pid, "")
 	if pname == "":
 		return "你已经走到最后了，加油！"
 	if progress == 0:
@@ -165,8 +164,7 @@ func _get_task_detail() -> String:
 	var needed: int = ch_def.get("required_sessions", 3)
 	var progress: int = GameManager.completed_sessions.get(pid, 0)
 	var min_grade: String = ch_def.get("min_grade", "D")
-	var patient_names := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
-	var pname: String = patient_names.get(pid, "")
+	var pname: String = GameManager.PATIENT_NAMES.get(pid, "")
 	var text := "当前章节：%s\n" % ch_def.get("title", "")
 	text += "目标患者：%s\n" % pname
 	text += "治疗进度：%d / %d 次\n" % [progress, needed]
