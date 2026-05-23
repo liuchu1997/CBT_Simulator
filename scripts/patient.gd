@@ -25,6 +25,49 @@ func _on_patient_unlocked_local(unlocked_pid: String):
 	if unlocked_pid == patient_id:
 		visible = true
 
+func _ensure_battle_data():
+	if not BattleEngine:
+		return
+	if BattleEngine.get_patient_data(patient_id).size() > 0:
+		return
+	match patient_id:
+		"lin_xiaoyu":
+			_init_battle_data("lin_xiaoyu", {
+				"initial_state": 0,
+				"alliance": 20,
+				"anxiety": 45,
+				"depression": 70,
+				"defensiveness": 40,
+				"insight": 10,
+				"avoidance": 30,
+				"hope": 25,
+				"hidden_schemas": ["我不值得被爱", "我必须完美才能被接受", "如果我犯错，所有人都会离开我"],
+			})
+		"zhang_hao":
+			_init_battle_data("zhang_hao", {
+				"initial_state": 0,
+				"alliance": 15,
+				"anxiety": 80,
+				"depression": 30,
+				"defensiveness": 50,
+				"insight": 5,
+				"avoidance": 20,
+				"hope": 40,
+				"hidden_schemas": ["世界是危险的", "我必须控制一切才能安全", "失控意味着死亡"],
+			})
+		"wang_mei":
+			_init_battle_data("wang_mei", {
+				"initial_state": 0,
+				"alliance": 15,
+				"anxiety": 75,
+				"depression": 50,
+				"defensiveness": 35,
+				"insight": 8,
+				"avoidance": 40,
+				"hope": 30,
+				"hidden_schemas": ["都是我的错", "如果我让别人不高兴，就是我不好", "我必须取悦所有人"],
+			})
+
 func _init_patient_data():
 	match patient_id:
 		"lin_xiaoyu":
@@ -97,6 +140,10 @@ func on_interact():
 		_show_skill_requirement_dialogue(chapter_id)
 		return
 	
+	if chapter_id != "" and GameManager.is_chapter_completed(chapter_id):
+		_show_completion_dialogue()
+		return
+	
 	var progress := GameManager.get_patient_progress(patient_id)
 	if progress >= max_sessions:
 		if chapter_id != "" and GameManager.current_chapter == chapter_id:
@@ -105,6 +152,7 @@ func on_interact():
 				return
 		_show_completion_dialogue()
 	else:
+		_ensure_battle_data()
 		_start_session()
 
 func _get_chapter_id() -> String:
@@ -206,69 +254,27 @@ func _lin_dialogue(s: int) -> Array[Dictionary]:
 			d.append({"speaker": "林小雨", "text": "说实话...我觉得来这可能也没什么用。我什么都做不好，咨询又能改变什么呢..."})
 			d.append({
 				"choices": [
-					{
-						"text": "你能告诉我，是什么让你有这种感觉的吗？",
-						"score_category": "active_listening",
-						"score_points": 3,
-						"feedback": "开放式问题引导患者表达",
-						"id": "lin_s1_open",
-					},
-					{
-						"text": "我理解你现在的感受。来到这里需要很大的勇气。",
-						"score_category": "empathy",
-						"score_points": 3,
-						"feedback": "共情患者的感受，肯定她的勇气",
-						"id": "lin_s1_empathy",
-					},
-					{
-						"text": "别这么想，你一定有很多优点的！",
-						"score_category": "rapport",
-						"score_points": -1,
-						"feedback": "过早安慰，未充分倾听",
-						"id": "lin_s1_dismiss",
-					},
-					{
-						"text": "这种想法是不合理的，你应该更积极地看问题。",
-						"score_category": "cognitive_restructuring",
-						"score_points": -3,
-						"feedback": "直接否定患者感受，缺乏共情",
-						"id": "lin_s1_confront",
-					},
+					{"text": "你能告诉我，是什么让你有这种感觉的吗？", "score_category": "active_listening", "score_points": 3, "feedback": "开放式问题引导患者表达", "id": "lin_s1_open", "next": "lin_s1_resp1_open"},
+					{"text": "我理解你现在的感受。来到这里需要很大的勇气。", "score_category": "empathy", "score_points": 3, "feedback": "共情患者的感受，肯定她的勇气", "id": "lin_s1_empathy", "next": "lin_s1_resp1_empathy"},
+					{"text": "别这么想，你一定有很多优点的！", "score_category": "rapport", "score_points": -1, "feedback": "过早安慰，未充分倾听", "id": "lin_s1_dismiss", "next": "lin_s1_resp1_dismiss"},
+					{"text": "这种想法是不合理的，你应该更积极地看问题。", "score_category": "cognitive_restructuring", "score_points": -3, "feedback": "直接否定患者感受，缺乏共情", "id": "lin_s1_confront", "next": "lin_s1_resp1_confront"},
 				]
 			})
-			d.append({"speaker": "林小雨", "text": "...（她低下头沉默了一会）也许吧...其实最近工作上的项目出了问题，领导在会上批评了我..."})
+			d.append({"label": "lin_s1_resp1_open", "speaker": "林小雨", "text": "...你真的想听？好久没人问我了...其实最近工作上的项目出了问题，领导在会上批评了我..."})
+			d.append({"label": "lin_s1_resp1_empathy", "speaker": "林小雨", "text": "...谢谢你能理解。其实...最近工作上的项目出了问题，领导在会上批评了我..."})
+			d.append({"label": "lin_s1_resp1_dismiss", "speaker": "林小雨", "text": "（勉强笑了笑）...你这么说让我有点不自在。其实最近项目出了问题，领导批评了我..."})
+			d.append({"label": "lin_s1_resp1_confront", "speaker": "林小雨", "text": "（身体缩了一下）...你这样说让我更难过了。我只是想被听到而已..."})
 			d.append({"speaker": "林小雨", "text": "从那以后我就一直觉得，我是整个团队最差的人。我肯定要被裁掉了..."})
 			d.append({
 				"choices": [
-					{
-						"text": "你说是'整个团队最差的'——有什么具体的证据吗？",
-						"score_category": "socratic_questioning",
-						"score_points": 4,
-						"feedback": "苏格拉底式提问，引导检视证据",
-						"id": "lin_s1_socratic",
-					},
-					{
-						"text": "被领导批评确实很难受。你觉得'最差'这个词准确描述了情况吗？",
-						"score_category": "cognitive_restructuring",
-						"score_points": 3,
-						"feedback": "温和地引导患者审视认知扭曲",
-						"id": "lin_s1_reframe",
-					},
-					{
-						"text": "我觉得你太悲观了，一次批评不代表什么。",
-						"score_category": "empathy",
-						"score_points": -2,
-						"feedback": "否定感受，未能深入探索",
-						"id": "lin_s1_minimize",
-					},
+					{"text": "你说是'整个团队最差的'——有什么具体的证据吗？", "score_category": "socratic_questioning", "score_points": 4, "feedback": "苏格拉底式提问，引导检视证据", "id": "lin_s1_socratic", "next": "lin_s1_resp2_socratic"},
+					{"text": "被领导批评确实很难受。你觉得'最差'这个词准确描述了情况吗？", "score_category": "cognitive_restructuring", "score_points": 3, "feedback": "温和地引导患者审视认知扭曲", "id": "lin_s1_reframe", "next": "lin_s1_resp2_reframe"},
+					{"text": "我觉得你太悲观了，一次批评不代表什么。", "score_category": "empathy", "score_points": -2, "feedback": "否定感受，未能深入探索", "id": "lin_s1_minimize", "next": "lin_s1_resp2_minimize"},
 				]
 			})
-			var follow_up := _bond_text(
-				"...证据？嗯...其实上次我的代码审核分数还挺高的...但我就是控制不住这么想...",
-				"...证据？你说得对，上次代码审核我分数还挺高的...也许不是最差的？",
-				"...你提醒了我，上次代码审核我确实拿了高分。我不是最差的，谢谢你帮我看到这点。"
-			)
-			d.append({"speaker": "林小雨", "text": follow_up})
+			d.append({"label": "lin_s1_resp2_socratic", "speaker": "林小雨", "text": "...证据？嗯...其实上次我的代码审核分数还挺高的...但我就是控制不住这么想..."})
+			d.append({"label": "lin_s1_resp2_reframe", "speaker": "林小雨", "text": "...最差？也许不是最差的...上次代码审核我分数还挺高的。但批评的声音就是比赞扬的响..."})
+			d.append({"label": "lin_s1_resp2_minimize", "speaker": "林小雨", "text": "（沉默了一会）...你不懂，那不只是一次批评。它让我觉得我这个人就是不够好..."})
 			d.append({"speaker": "林小雨", "text": _bond_text(
 				"...谢谢你愿意听我说这些。好久没有人认真听我说话了...",
 				"和你说话感觉很安心。你真的在认真听我说话。",
@@ -284,30 +290,14 @@ func _lin_dialogue(s: int) -> Array[Dictionary]:
 			d.append({"speaker": "林小雨", "text": "我每天醒来就觉得心里很沉。做任何事都提不起劲，觉得自己是个废物..."})
 			d.append({
 				"choices": [
-					{
-						"text": "你说'每天醒来都觉得心里很沉'——这种感觉是从什么时候开始的？",
-						"score_category": "active_listening",
-						"score_points": 3,
-						"feedback": "引用患者原话，深入了解时间线",
-						"id": "lin_s2_explore",
-					},
-					{
-						"text": "我注意到你用了'废物'这个词。你觉得这个评价客观吗？",
-						"score_category": "cognitive_restructuring",
-						"score_points": 4,
-						"feedback": "识别贴标签的认知扭曲并引导反思",
-						"id": "lin_s2_label",
-					},
-					{
-						"text": "别这么说自己，你不是废物。",
-						"score_category": "rapport",
-						"score_points": -1,
-						"feedback": "直接否定，未能引导自我探索",
-						"id": "lin_s2_reject",
-					},
+					{"text": "你说'每天醒来都觉得心里很沉'——这种感觉是从什么时候开始的？", "score_category": "active_listening", "score_points": 3, "feedback": "引用患者原话，深入了解时间线", "id": "lin_s2_explore", "next": "lin_s2_resp1_explore"},
+					{"text": "我注意到你用了'废物'这个词。你觉得这个评价客观吗？", "score_category": "cognitive_restructuring", "score_points": 4, "feedback": "识别贴标签的认知扭曲并引导反思", "id": "lin_s2_label", "next": "lin_s2_resp1_label"},
+					{"text": "别这么说自己，你不是废物。", "score_category": "rapport", "score_points": -1, "feedback": "直接否定，未能引导自我探索", "id": "lin_s2_reject", "next": "lin_s2_resp1_reject"},
 				]
 			})
-			d.append({"speaker": "林小雨", "text": "大概是项目失败之后开始的吧...差不多三周了。每天晚上都睡不好，脑子里全是'我不行'..."})
+			d.append({"label": "lin_s2_resp1_explore", "speaker": "林小雨", "text": "大概是项目失败之后开始的吧...差不多三周了。每天晚上都睡不好，脑子里全是'我不行'..."})
+			d.append({"label": "lin_s2_resp1_label", "speaker": "林小雨", "text": "...废物...你说得对，这个词太极端了。但我该怎么形容这种感觉呢？就是觉得自己什么都做不好..."})
+			d.append({"label": "lin_s2_resp1_reject", "speaker": "林小雨", "text": "（叹了口气）...你是不是觉得我在无理取闹？那种感觉是真的...不是我自己想这么想的..."})
 			d.append({"speaker": "林小雨", "text": _bond_text(
 				"其实...你说得对，'废物'这个词确实太极端了。但我不这么想的话，又该怎么想呢？",
 				"你说得对，'废物'这个词太极端了。上次你帮我看到了这一点，这次我想再深入聊聊。",
@@ -315,30 +305,14 @@ func _lin_dialogue(s: int) -> Array[Dictionary]:
 			)})
 			d.append({
 				"choices": [
-					{
-						"text": "我们可以一起试试。你能想一个更平衡的方式来描述现在的状况吗？",
-						"score_category": "cognitive_restructuring",
-						"score_points": 4,
-						"feedback": "引导认知重构，合作式探索",
-						"id": "lin_s2_restructure",
-					},
-					{
-						"text": "当你想到'我不行'的时候，有没有什么证据证明你其实是可以的？",
-						"score_category": "socratic_questioning",
-						"score_points": 3,
-						"feedback": "引导寻找反面证据",
-						"id": "lin_s2_evidence",
-					},
-					{
-						"text": "你应该多想想积极的事情。",
-						"score_category": "rapport",
-						"score_points": -2,
-						"feedback": "简单化的建议，缺乏专业引导",
-						"id": "lin_s2_simple",
-					},
+					{"text": "我们可以一起试试。你能想一个更平衡的方式来描述现在的状况吗？", "score_category": "cognitive_restructuring", "score_points": 4, "feedback": "引导认知重构，合作式探索", "id": "lin_s2_restructure", "next": "lin_s2_resp2_restructure"},
+					{"text": "当你想到'我不行'的时候，有没有什么证据证明你其实是可以的？", "score_category": "socratic_questioning", "score_points": 3, "feedback": "引导寻找反面证据", "id": "lin_s2_evidence", "next": "lin_s2_resp2_evidence"},
+					{"text": "你应该多想想积极的事情。", "score_category": "rapport", "score_points": -2, "feedback": "简单化的建议，缺乏专业引导", "id": "lin_s2_simple", "next": "lin_s2_resp2_simple"},
 				]
 			})
-			d.append({"speaker": "林小雨", "text": "更平衡的方式...也许...'我遇到了一个困难，但我之前也解决过很多问题'？"})
+			d.append({"label": "lin_s2_resp2_restructure", "speaker": "林小雨", "text": "更平衡的方式...也许...'我遇到了一个困难，但我之前也解决过很多问题'？"})
+			d.append({"label": "lin_s2_resp2_evidence", "speaker": "林小雨", "text": "证据...上次项目我也解决过好几个技术难题。还有同事夸过我代码写得清楚..."})
+			d.append({"label": "lin_s2_resp2_simple", "speaker": "林小雨", "text": "（无力地）我也想积极...但就是做不到啊。那些消极想法像乌云一样笼罩着我..."})
 			d.append({"speaker": "林小雨", "text": _bond_text(
 				"（她露出了一个微弱的笑容）这样说的时候，感觉确实没那么沉重了。",
 				"（微笑）这样说的时候，那些消极想法好像缩小了。",
@@ -354,30 +328,14 @@ func _lin_dialogue(s: int) -> Array[Dictionary]:
 			)})
 			d.append({
 				"choices": [
-					{
-						"text": "同事没回消息这件事，除了'讨厌你'之外，还有哪些可能的解释？",
-						"score_category": "socratic_questioning",
-						"score_points": 4,
-						"feedback": "经典的替代解释技术，对抗读心术",
-						"id": "lin_s3_alternative",
-					},
-					{
-						"text": "你能回想起当时的具体想法吗？脑子里闪过了什么？",
-						"score_category": "active_listening",
-						"score_points": 3,
-						"feedback": "帮助患者捕捉自动化思维",
-						"id": "lin_s3_auto",
-					},
-					{
-						"text": "别人不回消息是很正常的事，不要想太多。",
-						"score_category": "empathy",
-						"score_points": -2,
-						"feedback": "轻视患者的感受，未深入探索",
-						"id": "lin_s3_dismiss",
-					},
+					{"text": "同事没回消息这件事，除了'讨厌你'之外，还有哪些可能的解释？", "score_category": "socratic_questioning", "score_points": 4, "feedback": "经典的替代解释技术，对抗读心术", "id": "lin_s3_alternative", "next": "lin_s3_resp1_alt"},
+					{"text": "你能回想起当时的具体想法吗？脑子里闪过了什么？", "score_category": "active_listening", "score_points": 3, "feedback": "帮助患者捕捉自动化思维", "id": "lin_s3_auto", "next": "lin_s3_resp1_auto"},
+					{"text": "别人不回消息是很正常的事，不要想太多。", "score_category": "empathy", "score_points": -2, "feedback": "轻视患者的感受，未深入探索", "id": "lin_s3_dismiss", "next": "lin_s3_resp1_dismiss"},
 				]
 			})
-			d.append({"speaker": "林小雨", "text": "其他解释...也许是太忙了？或者没看到？嗯...确实有可能。"})
+			d.append({"label": "lin_s3_resp1_alt", "speaker": "林小雨", "text": "其他解释...也许是太忙了？或者没看到？嗯...确实有可能。"})
+			d.append({"label": "lin_s3_resp1_auto", "speaker": "林小雨", "text": "当时脑子里闪过的是...'她肯定觉得我很烦，不想理我了'。然后心就开始往下沉..."})
+			d.append({"label": "lin_s3_resp1_dismiss", "speaker": "林小雨", "text": "（有些委屈）...我知道是正常的，但我控制不住那种感觉啊。一发生就自动往最坏的方向想..."})
 			d.append({"speaker": "林小雨", "text": _bond_text(
 				"我发现我总是自动往最坏的方向想。这种模式...好像从小就有。",
 				"我发现我总是自动往最坏的方向想。但现在我能意识到了，这就是进步，对吧？",
@@ -427,58 +385,25 @@ func _zhang_dialogue(s: int) -> Array[Dictionary]:
 			)})
 			d.append({
 				"choices": [
-					{
-						"text": "你脑中担心的事情，有多少是真正发生了的？",
-						"score_category": "socratic_questioning",
-						"score_points": 4,
-						"feedback": "引导检视灾难化思维的现实基础",
-						"id": "zhang_s1_reality",
-					},
-					{
-						"text": "听起来你承受了很多。能具体说说最让你担心的是什么吗？",
-						"score_category": "empathy",
-						"score_points": 3,
-						"feedback": "共情并引导聚焦具体问题",
-						"id": "zhang_s1_focus",
-					},
-					{
-						"text": "想太多没用的，放松点。",
-						"score_category": "rapport",
-						"score_points": -3,
-						"feedback": "轻视焦虑症状，缺乏理解",
-						"id": "zhang_s1_relax",
-					},
+					{"text": "你脑中担心的事情，有多少是真正发生了的？", "score_category": "socratic_questioning", "score_points": 4, "feedback": "引导检视灾难化思维的现实基础", "id": "zhang_s1_reality", "next": "zhang_s1_resp1_reality"},
+					{"text": "听起来你承受了很多。能具体说说最让你担心的是什么吗？", "score_category": "empathy", "score_points": 3, "feedback": "共情并引导聚焦具体问题", "id": "zhang_s1_focus", "next": "zhang_s1_resp1_focus"},
+					{"text": "想太多没用的，放松点。", "score_category": "rapport", "score_points": -3, "feedback": "轻视焦虑症状，缺乏理解", "id": "zhang_s1_relax", "next": "zhang_s1_resp1_relax"},
 				]
 			})
-			d.append({"speaker": "张浩", "text": "真正发生的...嗯，好像大部分我担心的事都没有发生。但我控制不住啊！"})
+			d.append({"label": "zhang_s1_resp1_reality", "speaker": "张浩", "text": "真正发生的...嗯，好像大部分我担心的事都没有发生。但我控制不住啊！"})
+			d.append({"label": "zhang_s1_resp1_focus", "speaker": "张浩", "text": "最担心的...大概是健康吧。比如上周我肚子疼了一下，我就立刻觉得是不是得了什么大病..."})
+			d.append({"label": "zhang_s1_resp1_relax", "speaker": "张浩", "text": "（有些抵触）...如果能放松我还用来看你吗？你根本不了解这种感觉..."})
 			d.append({"speaker": "张浩", "text": "比如上周我肚子疼了一下，我就立刻觉得是不是得了什么大病...去医院检查了，什么事都没有。"})
 			d.append({
 				"choices": [
-				{
-					"text": "这是一个很好的例子。你能描述一下当时从'肚子疼'到'得大病'之间，脑子里经历了什么吗？",
-					"score_category": "active_listening",
-					"score_points": 3,
-					"feedback": "帮助患者识别自动化思维链条",
-					"id": "zhang_s1_chain",
-				},
-				{
-					"text": "[需要认知重构Lv.2] 让我们把你的思维画成一条链：肚子疼→得了大病→我会死。这条链的每一步都成立吗？",
-					"score_category": "cognitive_restructuring",
-					"score_points": 5,
-					"feedback": "高级认知链分析，系统性解构灾难化思维",
-					"id": "zhang_s1_chain_advanced",
-					"requires_skill": "cognitive",
-					"requires_level": 2,
-				},
-				{
-					"text": "检查结果没事，这对你来说意味着什么？",
-					"score_category": "cognitive_restructuring",
-					"score_points": 3,
-					"feedback": "引导患者从经验中学习",
-					"id": "zhang_s1_learn",
-				},
+					{"text": "这是一个很好的例子。你能描述一下当时从'肚子疼'到'得大病'之间，脑子里经历了什么吗？", "score_category": "active_listening", "score_points": 3, "feedback": "帮助患者识别自动化思维链条", "id": "zhang_s1_chain", "next": "zhang_s1_resp2_chain"},
+					{"text": "[需要认知重构Lv.2] 让我们把你的思维画成一条链：肚子疼→得了大病→我会死。这条链的每一步都成立吗？", "score_category": "cognitive_restructuring", "score_points": 5, "feedback": "高级认知链分析，系统性解构灾难化思维", "id": "zhang_s1_chain_advanced", "requires_skill": "cognitive", "requires_level": 2, "next": "zhang_s1_resp2_adv"},
+					{"text": "检查结果没事，这对你来说意味着什么？", "score_category": "cognitive_restructuring", "score_points": 3, "feedback": "引导患者从经验中学习", "id": "zhang_s1_learn", "next": "zhang_s1_resp2_learn"},
 				]
 			})
+			d.append({"label": "zhang_s1_resp2_chain", "speaker": "张浩", "text": "当时脑子里就是...肚子疼→是不是癌症→我要死了→家里人怎么办...然后就喘不上气了。"})
+			d.append({"label": "zhang_s1_resp2_adv", "speaker": "张浩", "text": "（思考了一下）每一步...肚子疼到癌症？这个跳跃确实太大了。大部分肚子疼就是普通的消化问题..."})
+			d.append({"label": "zhang_s1_resp2_learn", "speaker": "张浩", "text": "意味着...我之前的担心是多余的？确实，每次担心的事最后都没发生。但我下次还是会控制不住..."})
 			d.append({"speaker": "张浩", "text": _bond_text(
 				"（松了口气）和你聊聊之后...好像没那么紧张了。下周还能来吗？",
 				"（明显放松了）每次和你聊完都觉得轻松不少。下周见。",
@@ -493,34 +418,14 @@ func _zhang_dialogue(s: int) -> Array[Dictionary]:
 			)})
 			d.append({
 				"choices": [
-					{
-						"text": "能举个具体的例子吗？你是怎么停下来评估的？",
-						"score_category": "active_listening",
-						"score_points": 3,
-						"feedback": "引导患者反思具体策略应用",
-						"id": "zhang_s2_example",
-					},
-					{
-						"text": "当你评估完概率后，焦虑程度有变化吗？",
-						"score_category": "cognitive_restructuring",
-						"score_points": 4,
-						"feedback": "强化认知重构的效果体验",
-						"id": "zhang_s2_assess",
-					},
-					{
-						"text": "焦虑是正常的，不用太在意。",
-						"score_category": "empathy",
-						"score_points": -2,
-						"feedback": "弱化患者感受，未深入引导",
-						"id": "zhang_s2_dismiss",
-					},
+					{"text": "能举个具体的例子吗？你是怎么停下来评估的？", "score_category": "active_listening", "score_points": 3, "feedback": "引导患者反思具体策略应用", "id": "zhang_s2_example", "next": "zhang_s2_resp1_example"},
+					{"text": "当你评估完概率后，焦虑程度有变化吗？", "score_category": "cognitive_restructuring", "score_points": 4, "feedback": "强化认知重构的效果体验", "id": "zhang_s2_assess", "next": "zhang_s2_resp1_assess"},
+					{"text": "焦虑是正常的，不用太在意。", "score_category": "empathy", "score_points": -2, "feedback": "弱化患者感受，未深入引导", "id": "zhang_s2_dismiss", "next": "zhang_s2_resp1_dismiss"},
 				]
 			})
-			d.append({"speaker": "张浩", "text": _bond_text(
-				"嗯...比如昨天老板发了一条消息说'谈谈'，我立刻觉得要被开了。但评估之后，概率其实很低。",
-				"昨天老板说'谈谈'，我差点恐慌发作。但我停下来想了一下，上次的绩效还是不错的。结果只是聊个项目。",
-				"上周五老板说'谈谈'，以前我肯定恐慌。但这次我冷静分析了概率——结果就是普通的工作讨论！"
-			)})
+			d.append({"label": "zhang_s2_resp1_example", "speaker": "张浩", "text": "昨天老板发了一条消息说'谈谈'，我立刻觉得要被开了。但评估之后，概率其实很低。结果只是聊个项目。"})
+			d.append({"label": "zhang_s2_resp1_assess", "speaker": "张浩", "text": "变化很大！比如老板说'谈谈'，我评估了被开除的概率大概只有5%。想完之后心跳就慢下来了。"})
+			d.append({"label": "zhang_s2_resp1_dismiss", "speaker": "张浩", "text": "（有些失落）...你说的对，焦虑是正常的。但那种恐惧感一点都不正常...感觉你不太理解我..."})
 			d.append({"speaker": "张浩", "text": "我觉得我在学着和焦虑共处了。谢谢你的方法。"})
 		_:
 			d.append({"speaker": "张浩", "text": "%s最近焦虑明显减少了。" % prefix})
@@ -561,29 +466,14 @@ func _wang_dialogue(s: int) -> Array[Dictionary]:
 			)})
 			d.append({
 				"choices": [
-					{
-						"text": "你说'都是你的错'——能举个例子吗？具体发生了什么？",
-						"score_category": "active_listening",
-						"score_points": 3,
-						"feedback": "引导具体化，避免泛化归因",
-						"id": "wang_s1_example",
-					},
-					{
-						"text": "我听到你在很多事情上都把责任归给自己。你觉得这公平吗？",
-						"score_category": "socratic_questioning",
-						"score_points": 4,
-						"feedback": "挑战个人化认知扭曲",
-						"id": "wang_s1_personal",
-					},
-					{
-						"text": "不要什么都怪自己，这样不好。",
-						"score_category": "rapport",
-						"score_points": -2,
-						"feedback": "简单安慰，未引导反思",
-						"id": "wang_s1_dismiss",
-					},
+					{"text": "你说'都是你的错'——能举个例子吗？具体发生了什么？", "score_category": "active_listening", "score_points": 3, "feedback": "引导具体化，避免泛化归因", "id": "wang_s1_example", "next": "wang_s1_resp1_example"},
+					{"text": "我听到你在很多事情上都把责任归给自己。你觉得这公平吗？", "score_category": "socratic_questioning", "score_points": 4, "feedback": "挑战个人化认知扭曲", "id": "wang_s1_personal", "next": "wang_s1_resp1_personal"},
+					{"text": "不要什么都怪自己，这样不好。", "score_category": "rapport", "score_points": -2, "feedback": "简单安慰，未引导反思", "id": "wang_s1_dismiss", "next": "wang_s1_resp1_dismiss"},
 				]
 			})
+			d.append({"label": "wang_s1_resp1_example", "speaker": "王美", "text": "比如上周项目延期了，虽然整个团队都有责任，但我就觉得主要是我的错..."})
+			d.append({"label": "wang_s1_resp1_personal", "speaker": "王美", "text": "...公平？也许不公平吧。但我就是控制不住，一出事就先怪自己。比如上周项目延期..."})
+			d.append({"label": "wang_s1_resp1_dismiss", "speaker": "王美", "text": "（有些无奈）我知道这样不好...但我改不了啊。一有事情出错我就条件反射地怪自己..."})
 			d.append({"speaker": "王美", "text": "比如上周项目延期了，虽然整个团队都有责任，但我就觉得主要是我的错..."})
 			d.append({"speaker": "王美", "text": _bond_text(
 				"（犹豫地）你觉得...这不全是我的错？",
@@ -592,31 +482,14 @@ func _wang_dialogue(s: int) -> Array[Dictionary]:
 			)})
 			d.append({
 				"choices": [
-					{
-						"text": "我们可以一起分析一下。项目延期，除了你之外还有哪些因素？",
-						"score_category": "cognitive_restructuring",
-						"score_points": 4,
-						"feedback": "引导多因归因，打破个人化",
-						"id": "wang_s1_factors",
-					},
-					{
-						"text": "如果同事遇到同样的情况，你会觉得全是她的错吗？",
-						"score_category": "socratic_questioning",
-						"score_points": 3,
-						"feedback": "双标准技术，促进自我同情",
-						"id": "wang_s1_double",
-					},
-					{
-						"text": "[需要认知重构Lv.3] 让我们做个实验：列出项目中每个人的责任比例，看看你的'100%是我的错'是否成立。",
-						"score_category": "cognitive_restructuring",
-						"score_points": 6,
-						"feedback": "高级行为实验技术，用数据挑战个人化",
-						"id": "wang_s1_experiment",
-						"requires_skill": "cognitive",
-						"requires_level": 3,
-					},
+					{"text": "我们可以一起分析一下。项目延期，除了你之外还有哪些因素？", "score_category": "cognitive_restructuring", "score_points": 4, "feedback": "引导多因归因，打破个人化", "id": "wang_s1_factors", "next": "wang_s1_resp2_factors"},
+					{"text": "如果同事遇到同样的情况，你会觉得全是她的错吗？", "score_category": "socratic_questioning", "score_points": 3, "feedback": "双标准技术，促进自我同情", "id": "wang_s1_double", "next": "wang_s1_resp2_double"},
+					{"text": "[需要认知重构Lv.3] 让我们做个实验：列出项目中每个人的责任比例，看看你的'100%是我的错'是否成立。", "score_category": "cognitive_restructuring", "score_points": 6, "feedback": "高级行为实验技术，用数据挑战个人化", "id": "wang_s1_experiment", "requires_skill": "cognitive", "requires_level": 3, "next": "wang_s1_resp2_experiment"},
 				]
 			})
+			d.append({"label": "wang_s1_resp2_factors", "speaker": "王美", "text": "（开始数手指）需求变更、测试环境出问题、人手不足...嗯，好像确实不全是我的问题。"})
+			d.append({"label": "wang_s1_resp2_double", "speaker": "王美", "text": "（惊讶）你说得对...如果同事这样，我不会怪她的。那我为什么要怪自己呢？"})
+			d.append({"label": "wang_s1_resp2_experiment", "speaker": "王美", "text": "（认真地列了一会）我大概占20%？需求方占了40%，还有时间不够...天哪，我之前真的以为全是我的错！"})
 			d.append({"speaker": "王美", "text": _bond_text(
 				"（惊讶）你说得对...如果同事这样，我不会怪她的。那我为什么要怪自己呢？",
 				"（恍然大悟）我确实对自己太苛刻了。谢谢你的提醒。",

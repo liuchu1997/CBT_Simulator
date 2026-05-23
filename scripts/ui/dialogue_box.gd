@@ -118,8 +118,8 @@ func _set_text_mode():
 	panel.offset_bottom = 0.0
 
 func _set_choice_mode():
-	panel.anchor_top = 0.0
-	panel.offset_top = 0.0
+	panel.anchor_top = 1.0
+	panel.offset_top = -300.0
 	panel.anchor_bottom = 1.0
 	panel.offset_bottom = 0.0
 

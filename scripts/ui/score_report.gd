@@ -26,8 +26,9 @@ func show_report(data: Dictionary, on_closed: Callable = Callable()):
 	var session_num: int = int(data.get("session_num", 1))
 	
 	session_label.text = "%s - 第 %d 次治疗" % [patient_name, session_num]
+	var max_possible: int = data.get("max_possible", 50)
 	grade_label.text = "评级: %s" % data.get("grade", "C")
-	total_label.text = "总分: %d / 100" % data.get("total", 0)
+	total_label.text = "总分: %d / %d" % [data.get("total", 0), max_possible]
 	
 	_clear_children(score_bars)
 	_clear_children(good_list)
@@ -53,14 +54,14 @@ func show_report(data: Dictionary, on_closed: Callable = Callable()):
 		
 		var bar := ProgressBar.new()
 		bar.min_value = 0
-		bar.max_value = 20
+		bar.max_value = ScoringSystem.MAX_PER_CATEGORY
 		bar.value = scores[cat]
 		bar.custom_minimum_size.x = 140
 		bar.show_percentage = true
 		hbox.add_child(bar)
 		
 		var val_label := Label.new()
-		val_label.text = "%d/20" % scores[cat]
+		val_label.text = "%d/%d" % [scores[cat], ScoringSystem.MAX_PER_CATEGORY]
 		val_label.add_theme_color_override("font_color", Color.WHITE)
 		val_label.add_theme_font_size_override("font_size", 12)
 		hbox.add_child(val_label)
@@ -84,6 +85,15 @@ func show_report(data: Dictionary, on_closed: Callable = Callable()):
 		bad_list.add_child(label)
 	
 	feedback_label.text = str(data.get("feedback", ""))
+	
+	var emotion_state: String = str(data.get("emotion_state", ""))
+	if emotion_state != "":
+		_add_chapter_hint("[color=cyan]患者当前情绪: %s | 治疗联盟: %d%%[/color]" % [emotion_state, data.get("alliance", 0)])
+	
+	var effect_labels: Array = data.get("effectiveness_labels", [])
+	if effect_labels.size() > 0:
+		var eff_text := "[color=yellow]技能效果: " + ", ".join(effect_labels) + "[/color]"
+		_add_chapter_hint(eff_text)
 	
 	var chapter_id: String = GameManager.current_chapter
 	var chapter_def: Dictionary = GameManager.get_chapter_def(chapter_id)

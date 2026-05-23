@@ -4,6 +4,7 @@ signal dialogue_started
 signal dialogue_finished
 signal text_displayed(speaker: String, text: String)
 signal choices_displayed(choices: Array)
+signal choice_selected(choice_id: String)
 
 var _is_active: bool = false
 var _current_queue: Array[Dictionary] = []
@@ -67,21 +68,25 @@ func select_choice(index: int):
 		return
 	
 	var choice: Dictionary = choices[index]
+	choice_selected.emit(choice.get("id", ""))
 	if choice.has("score_category"):
 		var pts: int = choice.get("score_points", 0)
 		var category: String = choice["score_category"]
 		var pid: String = GameManager.current_patient_id
 		
 		var battle_result: Dictionary = {}
+		var effectiveness_label: String = ""
 		if BattleEngine and BattleEngine.get_patient_data(pid).size() > 0:
 			battle_result = BattleEngine.apply_skill(pid, category, pts)
 			pts = battle_result.get("actual_points", pts)
+			effectiveness_label = battle_result.get("effectiveness_label", "")
 		
 		ScoringSystem.log_choice(
 			choice.get("id", ""),
 			category,
 			pts,
-			choice.get("feedback", "")
+			choice.get("feedback", ""),
+			effectiveness_label,
 		)
 		if pts > 0:
 			var bond_mod: int = mini(pts, 5) + SkillTree.get_bond_bonus()

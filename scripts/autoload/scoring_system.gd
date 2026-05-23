@@ -6,6 +6,8 @@ signal session_scored(result: Dictionary)
 var session_log: Array[Dictionary] = []
 var session_scores: Dictionary = {}
 
+const MAX_PER_CATEGORY := 10
+
 func start_new_session():
 	session_log.clear()
 	session_scores = {
@@ -16,7 +18,7 @@ func start_new_session():
 		"rapport": 0,
 	}
 
-func log_choice(choice_id: String, category: String, points: int, feedback: String = ""):
+func log_choice(choice_id: String, category: String, points: int, feedback: String = "", effectiveness: String = ""):
 	var actual_points := points
 	if SkillTree:
 		var mult: float = SkillTree.get_score_multiplier(category)
@@ -29,42 +31,56 @@ func log_choice(choice_id: String, category: String, points: int, feedback: Stri
 		"points": actual_points,
 		"base_points": points,
 		"feedback": feedback,
+		"effectiveness": effectiveness,
 	})
 	if session_scores.has(category):
-		session_scores[category] = maxi(session_scores[category] + actual_points, 0)
+		session_scores[category] = clampi(session_scores[category] + actual_points, 0, MAX_PER_CATEGORY)
 	choice_made.emit(category, actual_points)
 
 func evaluate_session() -> Dictionary:
 	var total := 0
-	var max_per_category := 20
 	for cat in session_scores:
-		session_scores[cat] = mini(session_scores[cat], max_per_category)
 		total += session_scores[cat]
 	
 	var good_choices: Array[String] = []
 	var bad_choices: Array[String] = []
+	var effect_labels: Array[String] = []
 	for entry in session_log:
-		if entry["points"] >= 2:
+		if entry["points"] >= 3:
 			good_choices.append(entry["feedback"])
 		elif entry["points"] <= 0:
 			bad_choices.append(entry["feedback"])
+		var eff: String = entry.get("effectiveness", "")
+		if eff != "" and eff != "一般":
+			effect_labels.append(eff)
+	
+	var patient_id: String = GameManager.current_patient_id
+	var emotion_state: String = ""
+	var alliance_val: int = 0
+	if BattleEngine and BattleEngine.get_patient_data(patient_id).size() > 0:
+		emotion_state = BattleEngine.get_state_name(patient_id)
+		alliance_val = BattleEngine.get_alliance(patient_id)
 	
 	var result := {
 		"scores": session_scores.duplicate(),
 		"total": total,
+		"max_possible": MAX_PER_CATEGORY * 5,
 		"grade": get_grade(total),
 		"good_choices": good_choices,
 		"bad_choices": bad_choices,
+		"effectiveness_labels": effect_labels,
+		"emotion_state": emotion_state,
+		"alliance": alliance_val,
 		"feedback": generate_feedback(session_scores),
 	}
 	session_scored.emit(result)
 	return result
 
 static func get_grade(score: int) -> String:
-	if score >= 12: return "S"
-	if score >= 10: return "A"
-	if score >= 7: return "B"
-	if score >= 4: return "C"
+	if score >= 25: return "S"
+	if score >= 20: return "A"
+	if score >= 15: return "B"
+	if score >= 8: return "C"
 	return "D"
 
 static func generate_feedback(scores: Dictionary) -> String:
@@ -83,6 +99,6 @@ static func generate_feedback(scores: Dictionary) -> String:
 		"rapport": "注意建立信任关系，不要急于给建议。",
 	}
 	
-	if lowest >= 15:
+	if lowest >= 8:
 		return "表现出色！继续保持这种专业的治疗风格。"
 	return tips.get(weakest, "继续努力！")

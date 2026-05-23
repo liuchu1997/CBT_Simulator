@@ -122,6 +122,8 @@ func get_chapter_status_text() -> String:
 		return ""
 	
 	var scores: Array = patient_scores.get(pid, [])
+	if scores.size() > needed:
+		scores = scores.slice(scores.size() - needed, scores.size())
 	var worst_grade: String = "S"
 	var grade_order := ["D", "C", "B", "A", "S"]
 	for s_data in scores:
@@ -144,6 +146,22 @@ func reset_patient_progress(patient_id: String):
 	patient_bond[patient_id] = bond_default.get(patient_id, 20)
 	if BattleEngine:
 		BattleEngine.reset_patient(patient_id)
+	
+	var target_chapter := ""
+	for ch_id in _chapter_defs:
+		if _chapter_defs[ch_id].get("patient_id", "") == patient_id:
+			target_chapter = ch_id
+			break
+	
+	if target_chapter == "":
+		return
+	
+	var chapter_order := ["chapter_1", "chapter_2", "chapter_3", "chapter_final"]
+	var target_idx: int = chapter_order.find(target_chapter)
+	for i in range(target_idx, chapter_order.size()):
+		completed_chapters.erase(chapter_order[i])
+	
+	current_chapter = target_chapter
 
 func check_chapter_completion() -> bool:
 	var def: Dictionary = _chapter_defs.get(current_chapter, {})
@@ -163,6 +181,8 @@ func check_chapter_completion() -> bool:
 		return true
 	
 	var scores: Array = patient_scores.get(pid, [])
+	if scores.size() > needed:
+		scores = scores.slice(scores.size() - needed, scores.size())
 	var meets_grade := true
 	var min_g: String = def.get("min_grade", "D")
 	var grade_order := ["D", "C", "B", "A", "S"]

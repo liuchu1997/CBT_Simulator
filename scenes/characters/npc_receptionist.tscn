@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://bnpcrcept01"]
 
-[ext_resource type="Script" path="res://scripts/npc_base.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/receptionist.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/npc_receptionist/idle_down.png" id="2_tex_idle_down"]
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/npc_receptionist/idle_up.png" id="3_tex_idle_up"]
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/npc_receptionist/idle_left.png" id="4_tex_idle_left"]
