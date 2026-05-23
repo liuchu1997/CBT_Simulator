@@ -185,7 +185,86 @@ func _start_session():
 		RoomManager.change_to_patient_room(patient_id)
 	
 	var dialogue := _build_session_dialogue(session_num)
+	
+	if session_num > 1 and GameManager.has_pending_homework(patient_id):
+		dialogue = _build_homework_review(patient_id, dialogue)
+	
+	if session_num == 1:
+		dialogue = _build_first_session_intro(dialogue)
+	
 	DialogueManager.start_dialogue(dialogue, _on_session_ended)
+
+func _build_first_session_intro(dialogue: Array[Dictionary]) -> Array[Dictionary]:
+	var intro: Array[Dictionary] = []
+	intro.append({"speaker": "你", "text": "你好，我是你的治疗师。在开始之前，我想先了解一下你的情况。"})
+	intro.append({"speaker": "你", "text": "你能告诉我，最近最困扰你的是什么吗？"})
+	intro.append({"speaker": npc_name, "text": _get_initial_complaint()})
+	intro.append({"speaker": "你", "text": "谢谢你愿意分享这些。在接下来的治疗中，我们会一起探索你的思维模式，找到应对的方法。"})
+	intro.append({"speaker": npc_name, "text": "...好的，我试试。"})
+	intro.append_array(dialogue)
+	return intro
+
+func _get_initial_complaint() -> String:
+	match patient_id:
+		"lin_xiaoyu": return "我觉得自己什么都做不好...工作上出了问题，领导批评了我，我就觉得自己是个废物。每天都很低落，什么都不想做。"
+		"zhang_hao": return "我每天都在担心各种事情，停不下来。工作、健康、家人...脑子里总是往最坏的方向想，非常焦虑。"
+		"wang_mei": return "我总觉得什么都是我的错。不管出什么事，我都会先怪自己。我知道这样不好，但控制不住。"
+		_: return "最近感觉不太好..."
+
+func _build_homework_review(pid: String, dialogue: Array[Dictionary]) -> Array[Dictionary]:
+	var hw: Dictionary = GameManager.get_homework(pid)
+	if hw.is_empty():
+		return dialogue
+	var review: Array[Dictionary] = []
+	review.append({"speaker": "你", "text": "上次我给你布置了一个练习——%s。你试过了吗？" % hw.get("task", "")})
+	review.append({"speaker": npc_name, "text": _get_homework_response(hw)})
+	GameManager.complete_homework(pid)
+	review.append_array(dialogue)
+	return review
+
+func _get_homework_response(hw: Dictionary) -> String:
+	var detail: String = hw.get("detail", "")
+	if detail.find("日记") >= 0 or detail.find("记录") >= 0:
+		return _bond_text(
+			"我试了一下...虽然有时候会忘记，但我确实注意到一些自动冒出来的消极想法。",
+			"我每天都在记！发现了很多自己平时没注意到的思维模式。",
+			"这个练习真的很有帮助。我现在能很快发现自己在进行认知扭曲了。"
+		)
+	if detail.find("放松") >= 0 or detail.find("呼吸") >= 0:
+		return _bond_text(
+			"试了几次深呼吸，确实焦虑的时候能稍微平静一点。",
+			"我现在每天睡前都做放松练习，睡眠质量好了不少。",
+			"放松技巧已经成为我的日常习惯了，感觉比以前平静很多。"
+		)
+	if detail.find("活动") >= 0 or detail.find("散步") >= 0:
+		return _bond_text(
+			"我去散了一次步...虽然不太想出门，但走完后心情确实好了一些。",
+			"这周我每天都出去走了走，发现运动真的能改善心情。",
+			"我现在很享受每天的活动时间，它已经成为我生活的一部分了。"
+		)
+	return _bond_text(
+		"我试了一下...虽然不太确定做得对不对。",
+		"我认真做了练习，感觉有一些帮助。",
+		"练习效果很好，我会继续坚持的。"
+	)
+
+func _assign_session_homework(session_num: int):
+	match patient_id:
+		"lin_xiaoyu":
+			if session_num == 1:
+				GameManager.assign_homework(patient_id, "情绪日记", "每天晚上花5分钟记录今天冒出来的消极想法，不用分析，只记录。")
+			elif session_num == 2:
+				GameManager.assign_homework(patient_id, "行为激活", "本周尝试做一件让自己有成就感的小事，比如散步15分钟或整理房间。")
+		"zhang_hao":
+			if session_num == 1:
+				GameManager.assign_homework(patient_id, "焦虑记录", "每次焦虑时，写下：1.我在担心什么？2.最坏的结果是什么？3.实际发生的概率有多大？")
+			elif session_num == 2:
+				GameManager.assign_homework(patient_id, "放松练习", "每天练习一次4-7-8呼吸法：吸气4秒→屏息7秒→呼气8秒，重复3次。")
+		"wang_mei":
+			if session_num == 1:
+				GameManager.assign_homework(patient_id, "双标准练习", "每次怪自己时，问：如果是好朋友遇到同样的情况，我会怪她吗？")
+			elif session_num == 2:
+				GameManager.assign_homework(patient_id, "责任饼图", "遇到问题时，画一个'责任饼图'，列出所有相关因素和各自的责任比例。")
 
 func _on_session_ended():
 	var result := ScoringSystem.evaluate_session()
@@ -194,6 +273,11 @@ func _on_session_ended():
 	GameManager.end_session(result)
 	_update_expression()
 	CbtTutorial._on_trigger("first_score")
+	_assign_session_homework(GameManager.current_session_num)
+	CbtTutorial._on_trigger("homework_assigned")
+	
+	if GameManager.current_session_num == 1:
+		CbtTutorial._on_trigger("cognitive_triangle")
 	
 	if RoomManager:
 		RoomManager.return_to_lobby()
@@ -306,11 +390,13 @@ func _lin_dialogue(s: int) -> Array[Dictionary]:
 				"choices": [
 					{"text": "我们可以一起试试。你能想一个更平衡的方式来描述现在的状况吗？", "score_category": "cognitive_restructuring", "score_points": 4, "feedback": "引导认知重构，合作式探索", "id": "lin_s2_restructure", "next": "lin_s2_resp2_restructure"},
 					{"text": "当你想到'我不行'的时候，有没有什么证据证明你其实是可以的？", "score_category": "socratic_questioning", "score_points": 3, "feedback": "引导寻找反面证据", "id": "lin_s2_evidence", "next": "lin_s2_resp2_evidence"},
+					{"text": "你觉得什么都不想做的时候，有没有试过先做一件小事？比如散步10分钟？", "score_category": "rapport", "score_points": 2, "feedback": "行为激活建议，但应先处理认知再建议行动", "id": "lin_s2_activate", "next": "lin_s2_resp2_activate"},
 					{"text": "你应该多想想积极的事情。", "score_category": "rapport", "score_points": -2, "feedback": "简单化的建议，缺乏专业引导", "id": "lin_s2_simple", "next": "lin_s2_resp2_simple"},
 				]
 			})
 			d.append({"label": "lin_s2_resp2_restructure", "speaker": "林小雨", "text": "更平衡的方式...也许...'我遇到了一个困难，但我之前也解决过很多问题'？"})
 			d.append({"label": "lin_s2_resp2_evidence", "speaker": "林小雨", "text": "证据...上次项目我也解决过好几个技术难题。还有同事夸过我代码写得清楚..."})
+			d.append({"label": "lin_s2_resp2_activate", "speaker": "林小雨", "text": "散步...？我以前喜欢散步的，但最近完全没动力出门。也许...我可以试试？"})
 			d.append({"label": "lin_s2_resp2_simple", "speaker": "林小雨", "text": "（无力地）我也想积极...但就是做不到啊。那些消极想法像乌云一样笼罩着我..."})
 			d.append({"speaker": "林小雨", "text": _bond_text(
 				"（她露出了一个微弱的笑容）这样说的时候，感觉确实没那么沉重了。",
@@ -419,11 +505,13 @@ func _zhang_dialogue(s: int) -> Array[Dictionary]:
 				"choices": [
 					{"text": "能举个具体的例子吗？你是怎么停下来评估的？", "score_category": "active_listening", "score_points": 3, "feedback": "引导患者反思具体策略应用", "id": "zhang_s2_example", "next": "zhang_s2_resp1_example"},
 					{"text": "当你评估完概率后，焦虑程度有变化吗？", "score_category": "cognitive_restructuring", "score_points": 4, "feedback": "强化认知重构的效果体验", "id": "zhang_s2_assess", "next": "zhang_s2_resp1_assess"},
+					{"text": "除了评估概率，你还可以试试4-7-8呼吸法：吸气4秒→屏息7秒→呼气8秒。", "score_category": "rapport", "score_points": 2, "feedback": "放松技术建议，可辅助但非核心CBT", "id": "zhang_s2_breath", "next": "zhang_s2_resp1_breath"},
 					{"text": "焦虑是正常的，不用太在意。", "score_category": "empathy", "score_points": -2, "feedback": "弱化患者感受，未深入引导", "id": "zhang_s2_dismiss", "next": "zhang_s2_resp1_dismiss"},
 				]
 			})
 			d.append({"label": "zhang_s2_resp1_example", "speaker": "张浩", "text": "昨天老板发了一条消息说'谈谈'，我立刻觉得要被开了。但评估之后，概率其实很低。结果只是聊个项目。"})
 			d.append({"label": "zhang_s2_resp1_assess", "speaker": "张浩", "text": "变化很大！比如老板说'谈谈'，我评估了被开除的概率大概只有5%。想完之后心跳就慢下来了。"})
+			d.append({"label": "zhang_s2_resp1_breath", "speaker": "张浩", "text": "4-7-8呼吸法？听起来很简单。我下次焦虑的时候试试看，也许能帮我冷静下来。"})
 			d.append({"label": "zhang_s2_resp1_dismiss", "speaker": "张浩", "text": "（有些失落）...你说的对，焦虑是正常的。但那种恐惧感一点都不正常...感觉你不太理解我..."})
 			d.append({"speaker": "张浩", "text": "我觉得我在学着和焦虑共处了。谢谢你的方法。"})
 		_:
@@ -648,7 +736,17 @@ func _show_completion_dialogue():
 		_:
 			d.append({"speaker": npc_name, "text": "谢谢你这段时间的帮助。"})
 			d.append({"speaker": npc_name, "text": "（微笑）希望你也能帮助更多的人。"})
+	
+	d.append({"speaker": "你", "text": _get_relapse_prevention()})
+	CbtTutorial._on_trigger("relapse_prevention")
 	DialogueManager.start_dialogue(d)
+
+func _get_relapse_prevention() -> String:
+	match patient_id:
+		"lin_xiaoyu": return "在结束之前，我想和你一起回顾一下。如果以后消极想法又出现了，记住：1.觉察到它——这是认知扭曲在作祟。2.问自己——有什么证据支持这个想法？3.用更平衡的方式重新描述。你已经有这些工具了。"
+		"zhang_hao": return "最后，让我们一起做个复发预防计划。如果以后焦虑又加剧了：1.先停下来做4-7-8呼吸。2.评估你担心的结果实际发生的概率。3.制定具体的应对计划。记住，你已经有这些策略了。"
+		"wang_mei": return "治疗结束前，我想提醒你：如果以后又开始怪自己了，记住这三步：1.停下来问——如果是朋友遇到，我会怪她吗？2.列出所有可能的原因，不只看自己。3.对自己友善一点。你已经不再是以前那个什么都揽到自己身上的你了。"
+		_: return "记住你在治疗中学到的方法，它们是你一生的工具。"
 
 func _update_expression():
 	var hope_val: float = emotion.get("hope", 0)

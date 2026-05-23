@@ -37,6 +37,8 @@ var total_sessions_count: int = 0
 var s_grade_count: int = 0
 var completed_chapters: Array[String] = []
 var current_chapter: String = "chapter_1"
+var homework: Dictionary = {}
+var therapy_goals: Dictionary = {}
 
 var _save_path: String = "user://save_data.json"
 
@@ -360,6 +362,26 @@ func get_patient_emotion_summary(patient_id: String) -> String:
 		result = "初始评估中"
 	return result
 
+func assign_homework(patient_id: String, task: String, detail: String):
+	homework[patient_id] = {"task": task, "detail": detail, "assigned_session": current_session_num, "completed": false}
+
+func complete_homework(patient_id: String):
+	if homework.has(patient_id):
+		homework[patient_id]["completed"] = true
+
+func get_homework(patient_id: String) -> Dictionary:
+	return homework.get(patient_id, {})
+
+func has_pending_homework(patient_id: String) -> bool:
+	var hw: Dictionary = homework.get(patient_id, {})
+	return not hw.is_empty() and not hw.get("completed", true)
+
+func set_therapy_goal(patient_id: String, goal: String):
+	therapy_goals[patient_id] = goal
+
+func get_therapy_goal(patient_id: String) -> String:
+	return therapy_goals.get(patient_id, "")
+
 func _add_journal_entry(patient_id: String, session_num: int, score_data: Dictionary):
 	var entry := {
 		"patient_id": patient_id,
@@ -420,6 +442,8 @@ func reset_game():
 	s_grade_count = 0
 	completed_chapters.clear()
 	current_chapter = "chapter_1"
+	homework.clear()
+	therapy_goals.clear()
 	if FileAccess.file_exists(_save_path):
 		DirAccess.remove_absolute(_save_path)
 	game_reset.emit()
@@ -444,6 +468,8 @@ func save_game():
 		"s_grade_count": s_grade_count,
 		"completed_chapters": completed_chapters,
 		"current_chapter": current_chapter,
+		"homework": homework,
+		"therapy_goals": therapy_goals,
 	}
 	var file = FileAccess.open(_save_path, FileAccess.WRITE)
 	if file:
@@ -485,3 +511,5 @@ func load_game():
 				for ch in loaded_chapters:
 					completed_chapters.append(str(ch))
 				current_chapter = data.get("current_chapter", "chapter_1")
+				homework = data.get("homework", {})
+				therapy_goals = data.get("therapy_goals", {})
