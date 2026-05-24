@@ -1,0 +1,92 @@
+[gd_scene load_steps=2 format=3 uid="uid://btaskui001"]
+
+[ext_resource type="Script" path="res://scripts/ui/task_ui.gd" id="1_script"]
+
+[node name="TaskUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 20.0
+offset_right = -30.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TaskPanel" type="Panel" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/TaskPanel"]
+layout_mode = 2
+offset_left = 12.0
+offset_top = 10.0
+offset_right = -12.0
+offset_bottom = -10.0
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="MarginContainer/TaskPanel/VBox"]
+layout_mode = 2
+
+[node name="ChapterLabel" type="Label" parent="MarginContainer/TaskPanel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 0.92, 0.5, 1)
+text = "章节信息"
+
+[node name="CloseBtn" type="Button" parent="MarginContainer/TaskPanel/VBox/Header"]
+layout_mode = 2
+custom_minimum_size = Vector2(70, 0)
+text = "关闭[T]"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/TaskPanel/VBox"]
+layout_mode = 2
+
+[node name="Content" type="HBoxContainer" parent="MarginContainer/TaskPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="TaskSection" type="VBoxContainer" parent="MarginContainer/TaskPanel/VBox/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(220, 0)
+size_flags_stretch_ratio = 0.4
+
+[node name="PatientSection" type="VBoxContainer" parent="MarginContainer/TaskPanel/VBox/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 0)
+size_flags_stretch_ratio = 0.35
+
+[node name="TipsSection" type="VBoxContainer" parent="MarginContainer/TaskPanel/VBox/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/TaskPanel/VBox"]
+layout_mode = 2
+
+[node name="HotkeyBar" type="RichTextLabel" parent="MarginContainer/TaskPanel/VBox"]
+layout_mode = 2
+custom_minimum_size.y = 20
+bbcode_enabled = true
+text = ""
+fit_content = true

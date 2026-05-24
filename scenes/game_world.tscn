@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://bgameworld001"]
+[gd_scene load_steps=21 format=3 uid="uid://bgameworld001"]
 
 [ext_resource type="Script" path="res://scripts/map_builder.gd" id="0_map"]
 [ext_resource type="PackedScene" path="res://scenes/characters/player.tscn" id="1_player"]
@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="16_pause"]
 [ext_resource type="PackedScene" path="res://scenes/ui/battle_hud.tscn" id="17_battle_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/patient_profile_ui.tscn" id="18_profile"]
+[ext_resource type="PackedScene" path="res://scenes/ui/task_ui.tscn" id="19_task"]
 
 [node name="GameWorld" type="Node2D"]
 script = ExtResource("0_map")
@@ -61,17 +62,53 @@ position_smoothing_speed = 8.0
 [node name="HUD" type="CanvasLayer" parent="."]
 layer = 1
 
-[node name="TaskLabel" type="RichTextLabel" parent="HUD"]
-visible = false
-anchors_preset = 0
-offset_left = 8.0
+[node name="StatusBar" type="Panel" parent="HUD"]
+offset_left = 4.0
 offset_top = 4.0
-offset_right = 460.0
-offset_bottom = 70.0
+offset_right = 320.0
+offset_bottom = 28.0
+
+[node name="StatusText" type="Label" parent="HUD/StatusBar"]
+offset_left = 6.0
+offset_top = 3.0
+offset_right = 314.0
+offset_bottom = 22.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+text = "Lv.1 | 第一章 | 总分: 0"
+horizontal_alignment = 0
+
+[node name="TaskHint" type="RichTextLabel" parent="HUD"]
+offset_left = 4.0
+offset_top = 32.0
+offset_right = 280.0
+offset_bottom = 56.0
 bbcode_enabled = true
 text = ""
 fit_content = true
-scroll_following = true
+
+[node name="HotkeyBar" type="Panel" parent="HUD"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = -24.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_vertical = 0
+
+[node name="HotkeyText" type="Label" parent="HUD/HotkeyBar"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.65, 0.7, 0.75, 1)
+text = "T 任务  |  K 技能树  |  J 日志  |  I 患者档案  |  ESC 暂停"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="InteractHint" type="Label" parent="HUD"]
 visible = false
@@ -80,13 +117,13 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -120.0
-offset_top = -80.0
-offset_right = 120.0
-offset_bottom = -60.0
+offset_left = -100.0
+offset_top = -60.0
+offset_right = 100.0
+offset_bottom = -40.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(1, 1, 0.3, 1)
 text = "[ 空格 ] 对话"
 horizontal_alignment = 1
@@ -118,4 +155,7 @@ visible = false
 visible = false
 
 [node name="PatientProfileUI" parent="HUD" instance=ExtResource("18_profile")]
+visible = false
+
+[node name="TaskUI" parent="HUD" instance=ExtResource("19_task")]
 visible = false

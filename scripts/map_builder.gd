@@ -20,7 +20,8 @@ const MH := 30
 @onready var floor_map: TileMap = $FloorMap
 @onready var wall_map: TileMap = $WallMap
 @onready var player: CharacterBody2D = $Player
-@onready var hud_task: RichTextLabel = $HUD/TaskLabel
+@onready var status_text: Label = $HUD/StatusBar/StatusText
+@onready var task_hint: RichTextLabel = $HUD/TaskHint
 @onready var hud_hint: Label = $HUD/InteractHint
 @onready var emotion_anger: Node2D = $EmotionAnger
 @onready var emotion_sadness: Node2D = $EmotionSadness
@@ -88,56 +89,33 @@ func _on_score_updated(_pid: String):
 	_update_task()
 
 func _update_task():
-	hud_task.visible = true
 	var level := GameManager.therapist_level
 	var score := GameManager.total_score
 	var chapter_title: String = GameManager.get_current_chapter_title()
-	var header := "[b]Lv.%d[/b] | %s | 总分: %d | 技能点: %d" % [level, chapter_title, score, GameManager.skill_points]
+	status_text.text = "Lv.%d | %s | 总分: %d | 技能点: %d" % [level, chapter_title, score, GameManager.skill_points]
 	if RoomManager and RoomManager.get_current_room() != "lobby":
-		header += " | [%s]" % RoomManager.get_room_name(RoomManager.get_current_room())
+		status_text.text += " | [%s]" % RoomManager.get_room_name(RoomManager.get_current_room())
 	
+	var hint := ""
 	if not _first_interact_done:
-		hud_task.text = header + "\n[b]操作:[/b] WASD移动 | 空格对话 | K技能树 | J日志 | ESC暂停\n[b]任务:[/b] 走近角色，按空格对话"
-		return
-	
-	var lin_progress := GameManager.get_patient_progress("lin_xiaoyu")
-	var zhang_unlocked := GameManager.is_patient_unlocked("zhang_hao")
-	var wang_unlocked := GameManager.is_patient_unlocked("wang_mei")
-	
-	var task := ""
-	var cur_ch := GameManager.current_chapter
-	var cur_def: Dictionary = GameManager.get_chapter_def(cur_ch)
-	
-	if _chapter_fail_reason != "":
-		var fail_ch_title: String = cur_def.get("title", "当前章节")
-		task = "[color=red][b]⚠ 章节未通过: %s[/b][/color]\n" % _chapter_fail_reason
-		task += "[color=yellow]补救方法: 再次与患者对话进行新的治疗，争取更好的评分。\n"
-		task += "提示: 使用共情、倾听类技能在患者防御时更有效；认知重构类在患者反思时更有效。\n"
-		task += "按 K 键查看技能树，了解当前技能等级。[/color]"
-	elif cur_def.is_empty():
-		task = "[b]任务:[/b] 探索诊室，与角色对话"
+		hint = "[color=yellow]走近角色按空格对话[/color]  |  [color=gray]按T查看任务[/color]"
+	elif _chapter_fail_reason != "":
+		hint = "[color=red]章节未通过[/color] | [color=yellow]再次治疗争取更好评分[/color]  |  [color=gray]T任务 K技能[/color]"
 	else:
+		var cur_def: Dictionary = GameManager.get_chapter_def(GameManager.current_chapter)
 		var pid: String = cur_def.get("patient_id", "")
-		var needed: int = cur_def.get("required_sessions", 3)
-		var progress: int = GameManager.get_patient_progress(pid)
-		var min_grade: String = cur_def.get("min_grade", "D")
-		var skill_reqs_met := GameManager.meets_skill_requirements(cur_ch)
-		
-		if not skill_reqs_met:
-			var missing: String = GameManager.get_missing_skills_text(cur_ch)
-			task = "[b]任务:[/b] 提升技能以解锁%s:\n%s\n（按K键升级技能）" % [cur_def.get("title", ""), missing]
-		elif pid == "final_review":
-			task = "[b]任务:[/b] 准备迎接最终挑战！"
-		elif progress >= needed:
-			task = "[b]任务:[/b] %s 治疗完成！章节评级要求: %s级以上" % [cur_def.get("title", ""), min_grade]
-		elif progress == 0:
+		if pid != "" and pid != "final_review":
+			var progress: int = GameManager.get_patient_progress(pid)
+			var needed: int = cur_def.get("required_sessions", 3)
 			var pname: String = GameManager.PATIENT_NAMES.get(pid, pid)
-			task = "[b]任务:[/b] 前往找到%s，按空格开始治疗 (%d/%d次)\n章节要求: %s级以上" % [pname, progress, needed, min_grade]
+			if progress < needed:
+				hint = "[color=cyan]%s[/color] 治疗进度 %d/%d  |  [color=gray]T任务 K技能[/color]" % [pname, progress, needed]
+			else:
+				hint = "[color=green]%s 治疗完成[/color]  |  [color=gray]T任务[/color]" % pname
 		else:
-			var pname: String = GameManager.PATIENT_NAMES.get(pid, pid)
-			task = "[b]任务:[/b] 再次与%s对话，继续治疗 (%d/%d次)\n章节要求: %s级以上" % [pname, progress, needed, min_grade]
+			hint = "[color=gray]T 任务 | K 技能树 | J 日志[/color]"
 	
-	hud_task.text = header + "\n" + task
+	task_hint.text = hint
 
 func _build_tileset() -> TileSet:
 	var ts := TileSet.new()
