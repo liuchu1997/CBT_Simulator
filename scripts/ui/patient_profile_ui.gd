@@ -4,6 +4,9 @@ signal closed
 
 @onready var name_label: Label = $CenterContainer/Panel/MarginContainer/VBoxContainer/Header/NameLabel
 @onready var diag_label: Label = $CenterContainer/Panel/MarginContainer/VBoxContainer/Header/DiagLabel
+@onready var emotion_section_title: Label = $CenterContainer/Panel/MarginContainer/VBoxContainer/EmotionSection/SectionTitle
+@onready var distortion_section_title: Label = $CenterContainer/Panel/MarginContainer/VBoxContainer/DistortionSection/SectionTitle
+@onready var session_section_title: Label = $CenterContainer/Panel/MarginContainer/VBoxContainer/SessionSection/SectionTitle
 @onready var emotion_container: VBoxContainer = $CenterContainer/Panel/MarginContainer/VBoxContainer/EmotionSection/EmotionBars
 @onready var distortions_label: RichTextLabel = $CenterContainer/Panel/MarginContainer/VBoxContainer/DistortionSection/DistortionsLabel
 @onready var session_label: RichTextLabel = $CenterContainer/Panel/MarginContainer/VBoxContainer/SessionSection/SessionLabel
@@ -20,6 +23,14 @@ func _ready():
 		visible = false
 		closed.emit()
 	)
+	_update_static_texts()
+	I18n.language_changed.connect(func(_l): _update_static_texts())
+
+func _update_static_texts():
+	emotion_section_title.text = I18n.t("profile_emotion")
+	distortion_section_title.text = I18n.t("profile_distortion")
+	session_section_title.text = I18n.t("profile_records")
+	close_btn.text = I18n.t("close")
 
 func toggle_patient_profile():
 	if visible:

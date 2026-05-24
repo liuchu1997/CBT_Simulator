@@ -9,12 +9,21 @@ extends Control
 @onready var feedback_label: RichTextLabel = $MarginContainer/Panel/VBoxContainer/FeedbackSection/FeedbackText
 @onready var continue_btn: Button = $MarginContainer/Panel/VBoxContainer/ContinueBtn
 @onready var session_label: Label = $MarginContainer/Panel/VBoxContainer/Header/SessionLabel
+@onready var score_section_title: Label = $MarginContainer/Panel/VBoxContainer/ScoreSection/SectionTitle
+@onready var feedback_section_title: Label = $MarginContainer/Panel/VBoxContainer/FeedbackSection/SectionTitle
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("overlay_ui")
 	continue_btn.pressed.connect(_on_continue)
 	visible = false
+	_update_static_texts()
+	I18n.language_changed.connect(func(_l): _update_static_texts())
+
+func _update_static_texts():
+	score_section_title.text = I18n.t("score_details")
+	feedback_section_title.text = I18n.t("score_feedback")
+	continue_btn.text = I18n.t("score_continue")
 
 var _on_closed_callback: Callable = Callable()
 

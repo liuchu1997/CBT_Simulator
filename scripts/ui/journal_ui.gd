@@ -3,6 +3,7 @@ extends Control
 @onready var bg: ColorRect = $Background
 @onready var main_panel: Panel = $MarginContainer/JournalPanel
 @onready var close_btn: Button = $MarginContainer/JournalPanel/VBox/Header/CloseBtn
+@onready var title_label: Label = $MarginContainer/JournalPanel/VBox/Header/TitleLabel
 @onready var session_count: Label = $MarginContainer/JournalPanel/VBox/Header/SessionCount
 @onready var entry_list: VBoxContainer = $MarginContainer/JournalPanel/VBox/Body/EntryList
 @onready var detail_panel: Panel = $MarginContainer/JournalPanel/VBox/Body/DetailPanel
@@ -14,6 +15,13 @@ func _ready():
 	add_to_group("overlay_ui")
 	visible = false
 	close_btn.pressed.connect(_on_close)
+	_update_static_texts()
+	I18n.language_changed.connect(func(_l): _update_static_texts())
+
+func _update_static_texts():
+	title_label.text = I18n.t("journal_title")
+	close_btn.text = I18n.t("close_j")
+	detail_text.text = I18n.t("select_record_detail")
 
 func _input(event: InputEvent):
 	if not event.is_action_pressed("journal"):

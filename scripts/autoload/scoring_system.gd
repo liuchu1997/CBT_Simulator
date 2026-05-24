@@ -101,4 +101,4 @@ static func generate_feedback(scores: Dictionary) -> String:
 	
 	if lowest >= 8:
 		return I18n.t("tip_excellent") if I18n else "Excellent! Keep up the professional style."
-	return tips.get(weakest, "继续努力！")
+	return tips.get(weakest, I18n.t("grade_general") if I18n else "Keep trying!")

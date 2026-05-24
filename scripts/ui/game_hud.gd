@@ -19,7 +19,7 @@ func set_task(text: String):
 
 func show_interact_hint(npc_name: String):
 	interact_label.visible = true
-	interact_label.text = "[ 空格 ] 与 %s 对话" % npc_name
+	interact_label.text = I18n.t("space_talk_to") % npc_name
 	_nearby_npc = npc_name
 
 func hide_interact_hint():
@@ -28,7 +28,7 @@ func hide_interact_hint():
 
 func _update_task():
 	if _current_task != "":
-		task_label.text = "[b]当前任务:[/b] " + _current_task
+		task_label.text = "[b]" + I18n.t("current_task_label") + "[/b] " + _current_task
 		task_label.visible = true
 	else:
 		task_label.visible = false

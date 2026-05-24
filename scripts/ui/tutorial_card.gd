@@ -9,7 +9,9 @@ func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = false
 	ok_btn.pressed.connect(_on_ok)
+	ok_btn.text = I18n.t("got_it_space")
 	CbtTutorial.tutorial_shown.connect(_on_tutorial)
+	I18n.language_changed.connect(func(_l): ok_btn.text = I18n.t("got_it_space"))
 
 func _on_tutorial(_id: String, title: String, text: String):
 	title_label.text = title

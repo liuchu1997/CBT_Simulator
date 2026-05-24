@@ -4,6 +4,7 @@ extends Control
 @onready var main_panel: Panel = $MarginContainer/SkillPanel
 @onready var points_label: Label = $MarginContainer/SkillPanel/VBox/Header/PointsLabel
 @onready var close_btn: Button = $MarginContainer/SkillPanel/VBox/Header/CloseBtn
+@onready var title_label: Label = $MarginContainer/SkillPanel/VBox/Header/TitleLabel
 @onready var columns: HBoxContainer = $MarginContainer/SkillPanel/VBox/Columns
 
 func _ready():
@@ -12,6 +13,12 @@ func _ready():
 	visible = false
 	close_btn.pressed.connect(_on_close)
 	SkillTree.skill_upgraded.connect(_on_skill_upgraded)
+	_update_static_texts()
+	I18n.language_changed.connect(func(_l): _update_static_texts())
+
+func _update_static_texts():
+	title_label.text = I18n.t("skill_tree_title")
+	close_btn.text = I18n.t("close")
 
 func _input(event: InputEvent):
 	if not event.is_action_pressed("skill_tree"):

@@ -11,6 +11,8 @@ func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = false
 	continue_btn.pressed.connect(_on_continue)
+	continue_btn.text = I18n.t("score_continue")
+	I18n.language_changed.connect(func(_l): continue_btn.text = I18n.t("score_continue"))
 
 func show_chapter_complete():
 	visible = true

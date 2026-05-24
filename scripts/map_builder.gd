@@ -23,6 +23,7 @@ const MH := 30
 @onready var status_text: Label = $HUD/StatusBar/StatusText
 @onready var task_hint: RichTextLabel = $HUD/TaskHint
 @onready var hud_hint: Label = $HUD/InteractHint
+@onready var hotkey_text: Label = $HUD/HotkeyBar/HotkeyText
 @onready var emotion_anger: Node2D = $EmotionAnger
 @onready var emotion_sadness: Node2D = $EmotionSadness
 @onready var emotion_fear: Node2D = $EmotionFear
@@ -41,7 +42,9 @@ func _ready():
 	_reposition_characters()
 	_setup_task_system()
 	_update_task()
+	_update_hotkey_bar()
 	_setup_camera()
+	I18n.language_changed.connect(func(_l): _update_task(); _update_hotkey_bar(); hud_hint.text = I18n.t("space_talk"))
 
 func _setup_camera():
 	var cam: Camera2D = player.get_node_or_null("Camera2D")
@@ -93,6 +96,7 @@ func _update_task():
 	var score := GameManager.total_score
 	var chapter_title: String = GameManager.get_current_chapter_title()
 	status_text.text = "Lv.%d | %s | %s: %d | %s: %d" % [level, chapter_title, I18n.t("total_score"), score, I18n.t("skill_points"), GameManager.skill_points]
+	hud_hint.text = I18n.t("space_talk")
 	if RoomManager and RoomManager.get_current_room() != "lobby":
 		status_text.text += " | [%s]" % RoomManager.get_room_name(RoomManager.get_current_room())
 	
@@ -116,6 +120,9 @@ func _update_task():
 			hint = "[color=gray]T %s | K %s | J %s[/color]" % [I18n.t("task_current"), I18n.t("skill_tree_title"), I18n.t("journal_title")]
 	
 	task_hint.text = hint
+
+func _update_hotkey_bar():
+	hotkey_text.text = I18n.t("hotkey_bar")
 
 func _build_tileset() -> TileSet:
 	var ts := TileSet.new()

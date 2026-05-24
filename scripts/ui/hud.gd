@@ -7,7 +7,7 @@ func _ready():
 
 func show_hint():
 	visible = true
-	interact_label.text = "[ 空格 ] 对话"
+	interact_label.text = I18n.t("space_talk")
 
 func hide_hint():
 	visible = false

@@ -14,8 +14,10 @@ func _ready():
 	add_to_group("overlay_ui")
 	visible = false
 	close_btn.pressed.connect(_on_close)
+	close_btn.text = I18n.t("close_t")
 	GameManager.chapter_completed.connect(func(_c): _refresh_if_visible())
 	GameManager.chapter_failed.connect(func(_c, _r): _refresh_if_visible())
+	I18n.language_changed.connect(func(_l): close_btn.text = I18n.t("close_t"))
 
 func _input(event: InputEvent):
 	if not event.is_action_pressed("task_panel"):

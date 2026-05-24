@@ -18,6 +18,14 @@ func _ready():
 	DialogueManager.choices_displayed.connect(_on_choices_displayed)
 	visible = false
 	continue_hint.visible = false
+	speaker_label.text = I18n.t("battle_patient")
+	text_label.text = ""
+	continue_hint.text = I18n.t("dialogue_hint_default")
+	I18n.language_changed.connect(func(_l):
+		if not visible:
+			speaker_label.text = I18n.t("battle_patient")
+			continue_hint.text = I18n.t("dialogue_hint_default")
+	)
 
 func _input(event: InputEvent):
 	if _state == State.HIDDEN:

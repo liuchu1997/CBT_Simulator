@@ -2,12 +2,15 @@ extends Control
 
 @onready var _alliance_bar: ProgressBar = $Panel/MarginContainer/VBoxContainer/AllianceRow/AllianceBar
 @onready var _alliance_label: Label = $Panel/MarginContainer/VBoxContainer/AllianceRow/AllianceLabel
+@onready var _alliance_title: Label = $Panel/MarginContainer/VBoxContainer/AllianceRow/AllianceTitle
 @onready var _state_label: Label = $Panel/MarginContainer/VBoxContainer/StateRow/StateValue
+@onready var _state_title: Label = $Panel/MarginContainer/VBoxContainer/StateRow/StateTitle
 @onready var _patient_name: Label = $Panel/MarginContainer/VBoxContainer/PatientName
 @onready var _stats_container: VBoxContainer = $Panel/MarginContainer/VBoxContainer/StatsContainer
 @onready var _effect_label: Label = $Panel/MarginContainer/VBoxContainer/EffectLabel
 @onready var _schema_label: Label = $Panel/MarginContainer/VBoxContainer/SchemaLabel
 @onready var _turn_label: Label = $Panel/MarginContainer/VBoxContainer/TurnRow/TurnValue
+@onready var _turn_title: Label = $Panel/MarginContainer/VBoxContainer/TurnRow/TurnTitle
 
 var _current_patient_id: String = ""
 var _stat_bars: Dictionary = {}
@@ -18,23 +21,22 @@ func _ready():
 	visible = false
 	_patient_name.add_theme_font_size_override("font_size", 13)
 	_patient_name.add_theme_color_override("font_color", Color(1, 0.95, 0.6))
-	var at: Label = $Panel/MarginContainer/VBoxContainer/AllianceRow/AllianceTitle
-	at.add_theme_font_size_override("font_size", 11)
-	at.add_theme_color_override("font_color", Color(0.3, 1, 0.5))
+	_alliance_title.add_theme_font_size_override("font_size", 11)
+	_alliance_title.add_theme_color_override("font_color", Color(0.3, 1, 0.5))
 	_alliance_label.add_theme_font_size_override("font_size", 10)
 	_alliance_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
 	_state_label.add_theme_font_size_override("font_size", 11)
 	_state_label.add_theme_color_override("font_color", Color(0.9, 0.5, 0.3))
-	var st: Label = $Panel/MarginContainer/VBoxContainer/StateRow/StateTitle
-	st.add_theme_font_size_override("font_size", 11)
-	st.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+	_state_title.add_theme_font_size_override("font_size", 11)
+	_state_title.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
 	_turn_label.add_theme_font_size_override("font_size", 11)
 	_turn_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
-	var tt: Label = $Panel/MarginContainer/VBoxContainer/TurnRow/TurnTitle
-	tt.add_theme_font_size_override("font_size", 11)
-	tt.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+	_turn_title.add_theme_font_size_override("font_size", 11)
+	_turn_title.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
 	_effect_label.add_theme_font_size_override("font_size", 12)
 	_schema_label.add_theme_font_size_override("font_size", 11)
+	_update_static_texts()
+	I18n.language_changed.connect(func(_l): _update_static_texts())
 	
 	BattleEngine.alliance_changed.connect(_on_alliance_changed)
 	BattleEngine.state_changed.connect(_on_state_changed)
@@ -172,3 +174,9 @@ func _eff_color(label: String) -> Color:
 
 func _get_patient_display_name(pid: String) -> String:
 	return GameManager.PATIENT_NAMES.get(pid, pid)
+
+func _update_static_texts():
+	_patient_name.text = I18n.t("battle_patient")
+	_alliance_title.text = I18n.t("battle_alliance")
+	_state_title.text = I18n.t("battle_emotion") + ":"
+	_turn_title.text = I18n.t("battle_turn") + ":"
