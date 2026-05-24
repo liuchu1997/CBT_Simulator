@@ -14,6 +14,5 @@ Thumbs.db
 
 # Builds
 export/
-*.exe
-*.x86_64
+build/
 *.apk
