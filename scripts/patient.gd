@@ -368,6 +368,13 @@ func _lin_dialogue(s: int) -> Array[Dictionary]:
 				"下周我还想来。我觉得这里能帮到我。",
 				"我已经开始期待下一次了。谢谢你。"
 			)})
+			d.append({
+				"choices": [
+					{"text": "下次消极想法出现的时候，试着问问自己：'这个想法有什么证据？'", "score_category": "socratic_questioning", "score_points": 3, "feedback": "布置自我检视练习，促进技能迁移", "id": "lin_s1_end_good", "next": "lin_s1_end_resp"},
+					{"text": "下周见，相信自己会好起来的。", "score_category": "rapport", "score_points": 1, "feedback": "简单鼓励结束", "id": "lin_s1_end_basic", "next": "lin_s1_end_resp"},
+				]
+			})
+			d.append({"label": "lin_s1_end_resp", "speaker": "林小雨", "text": "好的...我会记住的。下周见。"})
 		2:
 			d.append({"speaker": "林小雨", "text": "%s我又来了...这周过得很糟糕。" % prefix})
 			d.append({"speaker": "林小雨", "text": "我每天醒来就觉得心里很沉。做任何事都提不起劲，觉得自己是个废物..."})
@@ -403,6 +410,13 @@ func _lin_dialogue(s: int) -> Array[Dictionary]:
 				"（微笑）这样说的时候，那些消极想法好像缩小了。",
 				"（发自内心地笑了）太好了，我居然能自己找到替代想法了！这都是你教我的方法。"
 			)})
+			d.append({
+				"choices": [
+					{"text": "你觉得这种方法对你有帮助吗？你愿意在家也练习吗？", "score_category": "active_listening", "score_points": 2, "feedback": "鼓励患者自主练习，促进治疗迁移", "id": "lin_s2_practice", "next": "lin_s2_resp3_yes"},
+					{"text": "很好，这就是认知重构。下次消极想法出现时，记得用这个方法。", "score_category": "rapport", "score_points": 1, "feedback": "总结反馈，但缺少引导自主性", "id": "lin_s2_summary", "next": "lin_s2_resp3_yes"},
+				]
+			})
+			d.append({"label": "lin_s2_resp3_yes", "speaker": "林小雨", "text": "嗯，我试试看。下次那个'废物'的声音出现的时候，我会试着跟它对话。"})
 			d.append({"speaker": "林小雨", "text": "谢谢你...我会试着这样想的。下周见。"})
 		3:
 			d.append({"speaker": "林小雨", "text": "%s这周好一点了！我按照你说的，试着注意自己的想法。" % prefix})
@@ -494,6 +508,13 @@ func _zhang_dialogue(s: int) -> Array[Dictionary]:
 				"（明显放松了）每次和你聊完都觉得轻松不少。下周见。",
 				"（微笑着）你总是能帮我找到理性的角度。谢谢你，下周见！"
 			)})
+			d.append({
+				"choices": [
+					{"text": "下周当你又感到焦虑的时候，试试把'最坏结果'和'实际概率'都写下来。", "score_category": "cognitive_restructuring", "score_points": 2, "feedback": "布置结构化练习，强化认知技能", "id": "zhang_s1_hw_good", "next": "zhang_s1_end"},
+					{"text": "好的，我们下周继续。记得放松，别想太多。", "score_category": "rapport", "score_points": 0, "feedback": "结束治疗但未布置练习", "id": "zhang_s1_hw_neutral", "next": "zhang_s1_end"},
+				]
+			})
+			d.append({"label": "zhang_s1_end", "speaker": "张浩", "text": "好的，我会试试的。下周见！"})
 		2:
 			d.append({"speaker": "张浩", "text": "%s又来了...不过这次我试着你说的方法，焦虑的时候先停下来评估一下概率。" % prefix})
 			d.append({"speaker": "张浩", "text": _bond_text(
@@ -581,6 +602,13 @@ func _wang_dialogue(s: int) -> Array[Dictionary]:
 				"（恍然大悟）我确实对自己太苛刻了。谢谢你的提醒。",
 				"（微笑）我又学到了一个新方法。下次再出现这种想法的时候，我会用双标准来检查。"
 			)})
+			d.append({
+				"choices": [
+					{"text": "下次再出现'都是我的错'的想法时，试着用双标准问自己：'如果是朋友，我会怪她吗？'", "score_category": "active_listening", "score_points": 2, "feedback": "强化练习，促进技能泛化", "id": "wang_s1_end_practice", "next": "wang_s1_end_resp"},
+					{"text": "今天的对话很有价值。下次我们继续深入。", "score_category": "rapport", "score_points": 1, "feedback": "简单总结结束", "id": "wang_s1_end_simple", "next": "wang_s1_end_resp"},
+				]
+			})
+			d.append({"label": "wang_s1_end_resp", "speaker": "王美", "text": "好的，我会练习的。下周见。"})
 		2:
 			d.append({"speaker": "王美", "text": "%s我又来了。这周我试着你说的方法，遇到事情先不急着怪自己。" % prefix})
 			d.append({"speaker": "王美", "text": _bond_text(

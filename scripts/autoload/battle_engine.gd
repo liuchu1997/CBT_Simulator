@@ -65,20 +65,20 @@ var _effectiveness: Dictionary = {
 		EmotionState.INSIGHT: 1.0,
 	},
 	"socratic_questioning": {
-		EmotionState.GUARDED: 0.3,
+		EmotionState.GUARDED: 0.8,
 		EmotionState.TESTING: 1.0,
 		EmotionState.OPENING_UP: 2.0,
-		EmotionState.EMOTIONALLY_FLOODED: 0.3,
-		EmotionState.RESISTANT: 0.5,
+		EmotionState.EMOTIONALLY_FLOODED: 0.5,
+		EmotionState.RESISTANT: 0.6,
 		EmotionState.REFLECTIVE: 3.0,
 		EmotionState.INSIGHT: 2.0,
 	},
 	"cognitive_restructuring": {
-		EmotionState.GUARDED: 0.1,
-		EmotionState.TESTING: 0.5,
+		EmotionState.GUARDED: 0.5,
+		EmotionState.TESTING: 1.0,
 		EmotionState.OPENING_UP: 1.5,
-		EmotionState.EMOTIONALLY_FLOODED: 0.1,
-		EmotionState.RESISTANT: 0.3,
+		EmotionState.EMOTIONALLY_FLOODED: 0.3,
+		EmotionState.RESISTANT: 0.4,
 		EmotionState.REFLECTIVE: 3.0,
 		EmotionState.INSIGHT: 3.0,
 	},
@@ -166,7 +166,7 @@ func apply_skill(patient_id: String, category: String, base_points: int) -> Dict
 	
 	var actual_points: int = int(roundf(base_points * eff))
 	if base_points > 0 and eff < 0.5:
-		actual_points = -absi(base_points)
+		actual_points = 0
 	
 	var alliance_delta: int = _calc_alliance_delta(eff, base_points)
 	data["alliance"] = clampi(data["alliance"] + alliance_delta, 0, 100)

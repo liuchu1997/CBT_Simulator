@@ -6,7 +6,7 @@ signal session_scored(result: Dictionary)
 var session_log: Array[Dictionary] = []
 var session_scores: Dictionary = {}
 
-const MAX_PER_CATEGORY := 10
+const MAX_PER_CATEGORY := 20
 
 func start_new_session():
 	session_log.clear()
@@ -77,10 +77,10 @@ func evaluate_session() -> Dictionary:
 	return result
 
 static func get_grade(score: int) -> String:
-	if score >= 25: return "S"
-	if score >= 20: return "A"
-	if score >= 15: return "B"
-	if score >= 8: return "C"
+	if score >= 50: return "S"
+	if score >= 40: return "A"
+	if score >= 30: return "B"
+	if score >= 18: return "C"
 	return "D"
 
 static func generate_feedback(scores: Dictionary) -> String:

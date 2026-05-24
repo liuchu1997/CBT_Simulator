@@ -503,8 +503,8 @@ func _test_battle_engine_effectiveness():
 	BattleEngine.init_patient("eff_test", {"initial_state": 0, "alliance": 20})
 	
 	var r2: Dictionary = BattleEngine.apply_skill("eff_test", "cognitive_restructuring", 3)
-	if r2.get("actual_points", 0) >= 0:
-		_fail("GUARDED+cognitive应反效果: 实际%d" % r2.get("actual_points", 0))
+	if r2.get("actual_points", 0) >= 3:
+		_fail("GUARDED+cognitive应减弱: 实际%d" % r2.get("actual_points", 0))
 		return
 	
 	var eff_label: String = r2.get("effectiveness_label", "")
@@ -513,7 +513,7 @@ func _test_battle_engine_effectiveness():
 		return
 	
 	BattleEngine.reset_patient("eff_test")
-	_pass("克制效果: reflection放大=%d, cognitive反效果=%d, 标签=%s" % [r1.actual_points, r2.actual_points, eff_label])
+	_pass("克制效果: reflection放大=%d, cognitive减弱=%d, 标签=%s" % [r1.actual_points, r2.actual_points, eff_label])
 
 func _test_battle_engine_state_transition():
 	_start_test("战斗引擎-状态转换")
@@ -538,12 +538,12 @@ func _test_battle_engine_state_transition():
 	
 	BattleEngine.apply_skill("trans_test", "cognitive_restructuring", 3)
 	var state2: String = BattleEngine.get_state_name("trans_test")
-	if state2 != "抗拒":
-		_fail("GUARDED+cognitive应转RESISTANT, 实际%s" % state2)
+	if state2 == "敞开心扉" or state2 == "反思" or state2 == "领悟":
+		_fail("GUARDED+cognitive不应跳到高级状态, 实际%s" % state2)
 		return
 	
 	BattleEngine.reset_patient("trans_test")
-	_pass("GUARDED→%s, 反效果→RESISTANT" % state_name)
+	_pass("GUARDED→%s, 认知技能在防御期效果有限→%s" % [state_name, state2])
 
 func _test_battle_engine_schema_discovery():
 	_start_test("战斗引擎-Schema发现")
