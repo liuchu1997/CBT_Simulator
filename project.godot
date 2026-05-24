@@ -28,6 +28,7 @@ CbtTutorial="*res://scripts/autoload/cbt_tutorial.gd"
 FontLoader="*res://scripts/autoload/font_loader.gd"
 BattleEngine="*res://scripts/autoload/battle_engine.gd"
 RoomManager="*res://scripts/autoload/room_manager.gd"
+I18n="*res://scripts/autoload/i18n.gd"
 
 [display]
 

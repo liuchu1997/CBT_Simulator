@@ -56,7 +56,7 @@ func _on_choices_displayed(choices: Array):
 	_clear_choices()
 	_set_choice_mode()
 	
-	speaker_label.text = "请选择回应"
+	speaker_label.text = I18n.t("select_response")
 	text_label.text = ""
 	text_label.custom_minimum_size.y = 0
 	text_label.visible_ratio = 1.0
@@ -77,7 +77,7 @@ func _on_choices_displayed(choices: Array):
 			if current_level < req_level:
 				is_locked = true
 				var skill_name: String = SkillTree.get_skill_name(req_skill) if SkillTree else req_skill
-				lock_reason = " [需要 %s Lv.%d]" % [skill_name, req_level]
+				lock_reason = " [%s]" % (I18n.t("requires_skill") % [skill_name, req_level])
 		
 		if is_locked:
 			btn.text = "  %d. %s%s" % [i + 1, str(choice.get("text", "")), lock_reason]
@@ -133,7 +133,7 @@ func _start_typewriter(_text: String):
 		if _state == State.TYPING:
 			_set_state(State.WAITING_FOR_INPUT)
 			continue_hint.visible = true
-			continue_hint.text = "[ 空格 继续 ]"
+			continue_hint.text = I18n.t("space_continue")
 	)
 
 func _finish_typing():
@@ -141,7 +141,7 @@ func _finish_typing():
 	text_label.visible_ratio = 1.0
 	_set_state(State.WAITING_FOR_INPUT)
 	continue_hint.visible = true
-	continue_hint.text = "[ 空格 继续 ]"
+	continue_hint.text = I18n.t("space_continue")
 
 func _set_state(new_state: State):
 	_state = new_state

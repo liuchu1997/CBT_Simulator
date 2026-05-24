@@ -60,12 +60,12 @@ func _refresh():
 	
 	var cur_ch := GameManager.current_chapter
 	var cur_def: Dictionary = GameManager.get_chapter_def(cur_ch)
-	var ch_title: String = cur_def.get("title", "自由探索")
-	chapter_label.text = "%s  |  治疗师 Lv.%d" % [ch_title, GameManager.therapist_level]
+	var ch_title: String = cur_def.get("title", I18n.t("task_free_explore"))
+	chapter_label.text = "%s  |  Lv.%d" % [ch_title, GameManager.therapist_level]
 	
-	_add_task_header("当前任务")
+	_add_task_header(I18n.t("task_current"))
 	if cur_def.is_empty() or cur_def.get("patient_id", "") == "":
-		_add_task_row("探索诊室，与角色对话")
+		_add_task_row(I18n.t("task_explore"))
 	else:
 		var pid: String = cur_def.get("patient_id", "")
 		var needed: int = cur_def.get("required_sessions", 3)
@@ -76,21 +76,21 @@ func _refresh():
 		
 		if not skill_reqs_met:
 			var missing: String = GameManager.get_missing_skills_text(cur_ch)
-			_add_task_row("技能不足，需提升后解锁")
-			_add_task_row("缺少: %s" % missing)
-			_add_task_row("[按 K 键升级技能树]")
+			_add_task_row(I18n.t("task_not_unlocked"))
+			_add_task_row("%s: %s" % [I18n.t("skill_upgrade"), missing])
+			_add_task_row("[%s]" % I18n.t("skill_tree_title"))
 		elif progress >= needed:
 			var status: String = GameManager.get_chapter_status_text()
 			if status != "":
-				_add_task_row("已完成 %d/%d 次治疗" % [progress, needed])
-				_add_task_row("评级未达标: %s" % status)
+				_add_task_row(I18n.t("task_treatment_progress") % [progress, needed])
+				_add_task_row("%s: %s" % [I18n.t("score_grade"), status])
 			else:
-				_add_task_row("章节完成!")
+				_add_task_row(I18n.t("task_completed"))
 		else:
-			_add_task_row("与 %s 对话进行治疗 (%d/%d)" % [pname, progress, needed])
-			_add_task_row("章节要求: 最低 %s 级" % min_grade)
+			_add_task_row(I18n.t("task_treatment_hint") % [pname, progress, needed])
+			_add_task_row("%s: %s" % [I18n.t("task_chapter_info"), min_grade])
 		
-		_add_task_header("患者状态")
+		_add_task_header(I18n.t("task_patient_status"))
 		for test_pid in ["lin_xiaoyu", "zhang_hao", "wang_mei"]:
 			if GameManager.is_patient_unlocked(test_pid):
 				var test_name: String = GameManager.PATIENT_NAMES.get(test_pid, test_pid)
@@ -99,18 +99,18 @@ func _refresh():
 				var p: int = GameManager.get_patient_progress(test_pid)
 				var state: String = GameManager.get_patient_emotion_summary(test_pid).strip_edges()
 				if state == "":
-					state = "初始评估中"
+					state = I18n.t("state_active")
 				_add_patient_row(test_name, p, bond, bond_level, state)
 			else:
 				var locked_name: String = GameManager.PATIENT_NAMES.get(test_pid, "???")
-				_add_patient_row(locked_name + " [未解锁]", -1, 0, "", "")
+				_add_patient_row(locked_name + " [%s]" % I18n.t("task_not_unlocked"), -1, 0, "", "")
 	
-	_add_task_header("治疗提示")
+	_add_task_header(I18n.t("task_treatment_tips"))
 	var tips := _get_context_tips()
 	for tip in tips:
 		_add_tip_row(tip)
 	
-	hotkey_label.text = "[color=gray]T 任务 | K 技能树 | J 日志 | I 患者档案 | ESC 暂停[/color]"
+	hotkey_label.text = "[color=gray]%s[/color]" % I18n.t("task_hotkeys")
 
 func _get_context_tips() -> Array:
 	var tips: Array = []
@@ -118,21 +118,15 @@ func _get_context_tips() -> Array:
 	var pid: String = cur_def.get("patient_id", "")
 	
 	if pid == "lin_xiaoyu":
-		tips.append("林小雨有抑郁倾向，容易出现非黑即白思维")
-		tips.append("先用共情和倾听建立信任，再引导检视思维")
-		tips.append("防御时用反映/确认技巧，反思时用认知重构")
+		tips.append(I18n.t("tip_lin"))
 	elif pid == "zhang_hao":
-		tips.append("张浩的问题是灾难化思维，总往最坏处想")
-		tips.append("用苏格拉底提问检视担忧的现实基础")
-		tips.append("不要说'想太多没用'——他不被理解会更焦虑")
+		tips.append(I18n.t("tip_zhang"))
 	elif pid == "wang_mei":
-		tips.append("王美倾向个人化，什么错都怪自己")
-		tips.append("双标准技术很有效：'如果是同事遇到呢？'")
-		tips.append("不要简单安慰'别怪自己'——要引导她自己发现")
+		tips.append(I18n.t("tip_wang"))
 	
 	if tips.is_empty():
-		tips.append("通用技巧: 先共情倾听，不要急着给建议")
-		tips.append("用提问引导患者自己发现问题")
+		tips.append(I18n.t("task_treatment_tips"))
+		tips.append(I18n.t("task_treatment_hint"))
 	
 	return tips
 
@@ -163,14 +157,14 @@ func _add_patient_row(name: String, progress: int, bond: int, bond_level: String
 	
 	if progress >= 0:
 		var prog_label := Label.new()
-		prog_label.text = "%d次" % progress
+		prog_label.text = "%d" % progress
 		prog_label.custom_minimum_size.x = 40
 		prog_label.add_theme_font_size_override("font_size", 12)
 		prog_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
 		hbox.add_child(prog_label)
 		
 		var bond_label := Label.new()
-		bond_label.text = "信任%d" % bond
+		bond_label.text = "%s%d" % [I18n.t("profile_trust"), bond]
 		bond_label.custom_minimum_size.x = 60
 		bond_label.add_theme_font_size_override("font_size", 12)
 		var bond_color := Color(0.4, 1.0, 0.4) if bond >= 60 else Color(1.0, 0.8, 0.4) if bond >= 30 else Color(1.0, 0.5, 0.4)

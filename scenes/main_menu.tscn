@@ -51,6 +51,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "开始游戏"
 
+[node name="LangBtn" type="Button" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(240, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+text = "English"
+
 [node name="ResetBtn" type="Button" parent="CenterContainer/VBoxContainer"]
 visible = false
 custom_minimum_size = Vector2(240, 40)

@@ -46,9 +46,23 @@ func _process_next():
 	_current_index += 1
 	
 	if entry.has("speaker") and entry.has("text"):
-		text_displayed.emit(entry["speaker"], entry["text"])
+		var speaker: String = _localize(entry, "speaker")
+		var text: String = _localize(entry, "text")
+		text_displayed.emit(speaker, text)
 	elif entry.has("choices"):
-		choices_displayed.emit(entry["choices"])
+		var localized_choices: Array = []
+		for c in entry["choices"]:
+			var lc: Dictionary = c.duplicate()
+			lc["text"] = _localize(c, "text")
+			localized_choices.append(lc)
+		choices_displayed.emit(localized_choices)
+
+func _localize(entry: Dictionary, field: String) -> String:
+	if I18n and I18n.is_en():
+		var en_val: String = entry.get(field + "_en", "")
+		if en_val != "":
+			return en_val
+	return entry.get(field, "")
 
 func advance():
 	if not _is_active:

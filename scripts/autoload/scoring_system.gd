@@ -51,7 +51,7 @@ func evaluate_session() -> Dictionary:
 		elif entry["points"] <= 0:
 			bad_choices.append(entry["feedback"])
 		var eff: String = entry.get("effectiveness", "")
-		if eff != "" and eff != "一般":
+		if eff != "" and eff != I18n.t("effectiveness_normal"):
 			effect_labels.append(eff)
 	
 	var patient_id: String = GameManager.current_patient_id
@@ -92,13 +92,13 @@ static func generate_feedback(scores: Dictionary) -> String:
 			weakest = cat
 	
 	var tips := {
-		"empathy": "尝试更多地反映患者的情感，让他们感到被理解。",
-		"active_listening": "多使用开放式问题，让患者充分表达。",
-		"socratic_questioning": "尝试用提问引导患者自己发现思维中的不合理之处。",
-		"cognitive_restructuring": "帮助患者识别认知扭曲，并引导他们找到替代的合理想法。",
-		"rapport": "注意建立信任关系，不要急于给建议。",
+		"empathy": I18n.t("tip_empathy") if I18n else "Try to reflect the patient's emotions more.",
+		"active_listening": I18n.t("tip_listening") if I18n else "Use more open-ended questions.",
+		"socratic_questioning": I18n.t("tip_socratic") if I18n else "Guide the patient to discover irrational thoughts.",
+		"cognitive_restructuring": I18n.t("tip_cognitive") if I18n else "Help identify cognitive distortions.",
+		"rapport": I18n.t("tip_rapport") if I18n else "Build trust, don't rush to give advice.",
 	}
 	
 	if lowest >= 8:
-		return "表现出色！继续保持这种专业的治疗风格。"
+		return I18n.t("tip_excellent") if I18n else "Excellent! Keep up the professional style."
 	return tips.get(weakest, "继续努力！")

@@ -10,45 +10,38 @@ signal tutorial_closed
 var _step := 0
 var _steps := [
 	{
-		"title": "欢迎来到 CBT 心理治疗模拟器",
+		"title": I18n.t("tutorial_welcome"),
 		"lines": [
-			"你是一名心理咨询师。",
-			"你的工作是倾听患者、运用认知行为疗法(CBT)技术帮助他们。",
+			I18n.t("tutorial_role"),
 			"",
-			"让我们先了解一下基本操作。",
+			I18n.t("tutorial_move"),
 		]
 	},
 	{
-		"title": "基本操作",
+		"title": I18n.t("tutorial_move"),
 		"lines": [
-			"WASD / 方向键 — 移动角色",
-			"空格键 — 与面前的人对话 / 推进对话",
-			"I 键 — 查看患者档案",
-			"ESC — 暂停菜单",
+			"WASD — " + I18n.t("tutorial_move"),
+			"Space — " + I18n.t("tutorial_dialogue"),
+			"I — " + I18n.t("profile_title"),
+			"ESC — " + I18n.t("pause"),
 		]
 	},
 	{
-		"title": "如何对话",
+		"title": I18n.t("tutorial_dialogue"),
 		"lines": [
-			"走到患者面前，按 [空格] 开始对话。",
-			"对话中会出现多个选项，点击你的回应。",
-			"不同的回应对应不同的 CBT 技术，会影响评分。",
+			I18n.t("tutorial_dialogue"),
 		]
 	},
 	{
-		"title": "评分系统",
+		"title": I18n.t("tutorial_scoring"),
 		"lines": [
-			"每次治疗结束后会给出评分报告。",
-			"评分维度：共情 / 倾听 / 苏格拉底提问 / 认知重构 / 治疗关系",
-			"获得高评价需要运用专业的 CBT 技术。",
+			I18n.t("tutorial_scoring"),
 		]
 	},
 	{
-		"title": "当前任务",
+		"title": I18n.t("tutorial_task"),
 		"lines": [
-			"候诊大厅里有前台小李，可以先和她聊聊。",
-			"楼上诊室有患者林小雨（抑郁症），去和她对话吧。",
-			"走近她，按空格键开始第一次治疗。",
+			I18n.t("tutorial_task"),
 		]
 	},
 ]
@@ -74,9 +67,9 @@ func _show_step():
 		content.add_child(label)
 	
 	if _step < _steps.size() - 1:
-		continue_btn.text = "下一步 (%d/%d)" % [_step + 1, _steps.size()]
+		continue_btn.text = I18n.t("continue_label") + " (%d/%d)" % [_step + 1, _steps.size()]
 	else:
-		continue_btn.text = "开始游戏"
+		continue_btn.text = I18n.t("tutorial_start")
 	continue_btn.grab_focus()
 
 func _on_continue():

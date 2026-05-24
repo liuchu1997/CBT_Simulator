@@ -23,13 +23,13 @@ func show_report(data: Dictionary, on_closed: Callable = Callable()):
 	visible = true
 	get_tree().paused = true
 	
-	var patient_name: String = str(data.get("patient_name", "患者"))
+	var patient_name: String = str(data.get("patient_name", I18n.t("score_patient")))
 	var session_num: int = int(data.get("session_num", 1))
 	
-	session_label.text = "%s - 第 %d 次治疗" % [patient_name, session_num]
+	session_label.text = "%s - %s #%d" % [patient_name, I18n.t("score_report_title"), session_num]
 	var max_possible: int = data.get("max_possible", 50)
-	grade_label.text = "评级: %s" % data.get("grade", "C")
-	total_label.text = "总分: %d / %d" % [data.get("total", 0), max_possible]
+	grade_label.text = "%s: %s" % [I18n.t("score_grade"), data.get("grade", "C")]
+	total_label.text = "%s: %d / %d" % [I18n.t("score_total"), data.get("total", 0), max_possible]
 	
 	_clear_children(score_bars)
 	_clear_children(good_list)
@@ -37,11 +37,11 @@ func show_report(data: Dictionary, on_closed: Callable = Callable()):
 	
 	var scores: Dictionary = data.get("scores", {})
 	var category_names := {
-		"empathy": "共情能力",
-		"active_listening": "积极倾听",
-		"socratic_questioning": "苏格拉底式提问",
-		"cognitive_restructuring": "认知重构",
-		"rapport": "治疗关系",
+		"empathy": I18n.t("dimension_empathy"),
+		"active_listening": I18n.t("dimension_listening"),
+		"socratic_questioning": I18n.t("dimension_socratic"),
+		"cognitive_restructuring": I18n.t("dimension_cognitive"),
+		"rapport": I18n.t("dimension_relationship"),
 	}
 	
 	for cat in scores:
@@ -89,11 +89,11 @@ func show_report(data: Dictionary, on_closed: Callable = Callable()):
 	
 	var emotion_state: String = str(data.get("emotion_state", ""))
 	if emotion_state != "":
-		_add_chapter_hint("[color=cyan]患者当前情绪: %s | 治疗联盟: %d%%[/color]" % [emotion_state, data.get("alliance", 0)])
+		_add_chapter_hint("[color=cyan]%s: %s | %s: %d%%[/color]" % [I18n.t("score_emotion_state"), emotion_state, I18n.t("score_alliance"), data.get("alliance", 0)])
 	
 	var effect_labels: Array = data.get("effectiveness_labels", [])
 	if effect_labels.size() > 0:
-		var eff_text := "[color=yellow]技能效果: " + ", ".join(effect_labels) + "[/color]"
+		var eff_text := "[color=yellow]" + I18n.t("score_skill_effect") + ": " + ", ".join(effect_labels) + "[/color]"
 		_add_chapter_hint(eff_text)
 	
 	var chapter_id: String = GameManager.current_chapter
@@ -106,10 +106,10 @@ func show_report(data: Dictionary, on_closed: Callable = Callable()):
 		var min_idx: int = grade_order.find(min_grade)
 		
 		if grade_idx >= min_idx:
-			_add_chapter_hint("[color=green]章节要求: %s级以上 ✓ 已达标[/color]" % min_grade)
+			_add_chapter_hint("[color=green]" + I18n.t("score_chapter_pass") % min_grade + "[/color]")
 		else:
-			_add_chapter_hint("[color=red]章节要求: %s级以上 ✗ 当前为%s级[/color]" % [min_grade, grade])
-			_add_chapter_hint("[color=yellow]提示: 选择更专业的回应可以获得更高评分。请重新与患者对话继续治疗。[/color]")
+			_add_chapter_hint("[color=red]" + I18n.t("score_chapter_fail") % [min_grade, grade] + "[/color]")
+			_add_chapter_hint("[color=yellow]" + I18n.t("score_feedback") + "[/color]")
 	
 	continue_btn.grab_focus()
 

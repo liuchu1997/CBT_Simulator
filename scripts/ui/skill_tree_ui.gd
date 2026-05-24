@@ -45,7 +45,7 @@ func _on_close():
 	_close()
 
 func _refresh():
-	points_label.text = "技能点: %d" % GameManager.skill_points
+	points_label.text = "%s: %d" % [I18n.t("skill_points_label"), GameManager.skill_points]
 	_clear_columns()
 	
 	for line in SkillTree.get_all_lines():
@@ -68,7 +68,7 @@ func _refresh():
 				btn.disabled = true
 				btn.add_theme_color_override("font_color", Color(0.4, 1.0, 0.4))
 			elif i == level:
-				btn.text = "Lv%d: %s [升级]" % [i + 1, lvl_name]
+				btn.text = "Lv%d: %s [%s]" % [i + 1, lvl_name, I18n.t("skill_upgrade")]
 				btn.disabled = GameManager.skill_points <= 0
 				btn.add_theme_color_override("font_color", Color(1, 1, 0.5))
 				var l := line
@@ -82,7 +82,7 @@ func _refresh():
 			col.add_child(btn)
 		
 		var status := Label.new()
-		status.text = "等级: %d/4" % level
+		status.text = "%s: %d/4" % [I18n.t("skill_maxed"), level]
 		status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		status.add_theme_font_size_override("font_size", 11)
 		status.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))

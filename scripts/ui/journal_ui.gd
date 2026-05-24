@@ -50,12 +50,12 @@ func _refresh():
 	for child in entry_list.get_children():
 		child.queue_free()
 	
-	session_count.text = "治疗次数: %d" % GameManager.total_sessions_count
+	session_count.text = I18n.t("journal_count") % GameManager.total_sessions_count
 	
 	var entries: Array = GameManager.therapy_journal
 	if entries.is_empty():
 		var label := Label.new()
-		label.text = "暂无记录。开始你的第一次治疗吧！"
+		label.text = I18n.t("journal_empty")
 		label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 		entry_list.add_child(label)
 		detail_text.text = ""
@@ -63,7 +63,7 @@ func _refresh():
 		return
 	
 	var pname: String = GameManager.PATIENT_NAMES.get(entry.get("patient_id", ""), entry.get("patient_id", ""))
-	btn.text = "%s - 第%d次 | %s级 | %d分" % [
+		btn.text = "%s - #%d | %s | %d" % [
 		pname,
 			entry.get("session", 0),
 			entry.get("grade", "?"),
@@ -76,7 +76,7 @@ func _refresh():
 		entry_list.add_child(btn)
 	
 	var strategy_count: int = GameManager.learned_strategies.size()
-	strategies_label.text = "已学策略: %d个" % strategy_count
+	strategies_label.text = "%s: %d" % [I18n.t("journal_strategies"), strategy_count]
 
 func _show_detail(index: int):
 	var entries: Array = GameManager.therapy_journal
@@ -84,16 +84,16 @@ func _show_detail(index: int):
 		return
 	var entry: Dictionary = entries[index]
 	
-	var pname: String = GameManager.PATIENT_NAMES.get(entry.get("patient_id", ""), "未知")
+	var pname: String = GameManager.PATIENT_NAMES.get(entry.get("patient_id", ""), I18n.t("score_patient"))
 	
-	var text := "[b]%s - 第%d次治疗[/b]\n" % [pname, entry.get("session", 0)]
-	text += "评级: %s | 得分: %d\n" % [entry.get("grade", "?"), entry.get("score_total", 0)]
-	text += "信任值: %d\n" % entry.get("bond_after", 0)
+	var text := "[b]%s - #%d[/b]\n" % [pname, entry.get("session", 0)]
+	text += "%s: %s | %s: %d\n" % [I18n.t("score_grade"), entry.get("grade", "?"), I18n.t("score_total"), entry.get("score_total", 0)]
+	text += "%s: %d\n" % [I18n.t("profile_trust"), entry.get("bond_after", 0)]
 	
 	var emotions: Dictionary = entry.get("emotions", {})
 	if not emotions.is_empty():
-		text += "\n[b]情绪状态:[/b]\n"
-		var state_names := {"active": "活跃", "recovering": "恢复中", "resilient": "有韧性"}
+		text += "\n[b]%s:[/b]\n" % I18n.t("score_emotion_state")
+		var state_names := {"active": I18n.t("state_active"), "recovering": I18n.t("state_recovering"), "resilient": I18n.t("state_resilient")}
 		for cat in emotions:
 			text += "  %s: %s\n" % [cat, state_names.get(emotions[cat], emotions[cat])]
 	

@@ -92,15 +92,15 @@ func _update_task():
 	var level := GameManager.therapist_level
 	var score := GameManager.total_score
 	var chapter_title: String = GameManager.get_current_chapter_title()
-	status_text.text = "Lv.%d | %s | 总分: %d | 技能点: %d" % [level, chapter_title, score, GameManager.skill_points]
+	status_text.text = "Lv.%d | %s | %s: %d | %s: %d" % [level, chapter_title, I18n.t("total_score"), score, I18n.t("skill_points"), GameManager.skill_points]
 	if RoomManager and RoomManager.get_current_room() != "lobby":
 		status_text.text += " | [%s]" % RoomManager.get_room_name(RoomManager.get_current_room())
 	
 	var hint := ""
 	if not _first_interact_done:
-		hint = "[color=yellow]走近角色按空格对话[/color]  |  [color=gray]按T查看任务[/color]"
+		hint = "[color=yellow]%s[/color]  |  [color=gray]%s[/color]" % [I18n.t("hint_interact"), I18n.t("hint_task")]
 	elif _chapter_fail_reason != "":
-		hint = "[color=red]章节未通过[/color] | [color=yellow]再次治疗争取更好评分[/color]  |  [color=gray]T任务 K技能[/color]"
+		hint = "[color=red]%s[/color] | [color=yellow]%s[/color]  |  [color=gray]%s[/color]" % [I18n.t("hint_not_passed"), I18n.t("hint_retry"), I18n.t("hint_skills")]
 	else:
 		var cur_def: Dictionary = GameManager.get_chapter_def(GameManager.current_chapter)
 		var pid: String = cur_def.get("patient_id", "")
@@ -109,11 +109,11 @@ func _update_task():
 			var needed: int = cur_def.get("required_sessions", 3)
 			var pname: String = GameManager.PATIENT_NAMES.get(pid, pid)
 			if progress < needed:
-				hint = "[color=cyan]%s[/color] 治疗进度 %d/%d  |  [color=gray]T任务 K技能[/color]" % [pname, progress, needed]
+				hint = "[color=cyan]%s[/color] %s %d/%d  |  [color=gray]%s[/color]" % [pname, I18n.t("hint_treatment_progress"), progress, needed, I18n.t("hint_skills")]
 			else:
-				hint = "[color=green]%s 治疗完成[/color]  |  [color=gray]T任务[/color]" % pname
+				hint = "[color=green]%s %s[/color]  |  [color=gray]%s[/color]" % [pname, I18n.t("task_completed"), I18n.t("hint_task")]
 		else:
-			hint = "[color=gray]T 任务 | K 技能树 | J 日志[/color]"
+			hint = "[color=gray]T %s | K %s | J %s[/color]" % [I18n.t("task_current"), I18n.t("skill_tree_title"), I18n.t("journal_title")]
 	
 	task_hint.text = hint
 

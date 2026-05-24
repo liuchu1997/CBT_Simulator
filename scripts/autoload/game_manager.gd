@@ -12,7 +12,12 @@ signal tutorial_trigger(tutorial_id: String)
 signal game_reset
 signal chapter_failed(chapter_id: String, reason: String)
 
-const PATIENT_NAMES := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
+const PATIENT_NAMES_ZH := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
+const PATIENT_NAMES_EN := {"lin_xiaoyu": "Lin Xiaoyu", "zhang_hao": "Zhang Hao", "wang_mei": "Wang Mei"}
+
+var PATIENT_NAMES: Dictionary:
+	get:
+		return PATIENT_NAMES_EN if I18n.is_en() else PATIENT_NAMES_ZH
 const BOND_DEFAULTS := {"lin_xiaoyu": 30, "zhang_hao": 25, "wang_mei": 20}
 
 var current_patient_id: String = ""
@@ -44,7 +49,7 @@ var _save_path: String = "user://save_data.json"
 
 var _chapter_defs: Dictionary = {
 	"chapter_1": {
-		"title": "第一章：初入诊室",
+		"title_key": "chapter_1_title",
 		"patient_id": "lin_xiaoyu",
 		"required_sessions": 3,
 		"min_grade": "D",
@@ -52,7 +57,7 @@ var _chapter_defs: Dictionary = {
 		"skill_requirements": {},
 	},
 	"chapter_2": {
-		"title": "第二章：焦虑的面具",
+		"title_key": "chapter_2_title",
 		"patient_id": "zhang_hao",
 		"required_sessions": 3,
 		"min_grade": "D",
@@ -60,7 +65,7 @@ var _chapter_defs: Dictionary = {
 		"skill_requirements": {"cognitive": 1, "empathic": 1},
 	},
 	"chapter_3": {
-		"title": "第三章：自我归因",
+		"title_key": "chapter_3_title",
 		"patient_id": "wang_mei",
 		"required_sessions": 3,
 		"min_grade": "C",
@@ -68,7 +73,7 @@ var _chapter_defs: Dictionary = {
 		"skill_requirements": {"cognitive": 2, "empathic": 2},
 	},
 	"chapter_final": {
-		"title": "终章：治疗师的成长",
+		"title_key": "chapter_final_title",
 		"patient_id": "final_review",
 		"required_sessions": 1,
 		"min_grade": "B",
@@ -84,7 +89,10 @@ func get_chapter_def(chapter_id: String) -> Dictionary:
 	return _chapter_defs.get(chapter_id, {})
 
 func get_current_chapter_title() -> String:
-	return _chapter_defs.get(current_chapter, {}).get("title", "")
+	var key: String = _chapter_defs.get(current_chapter, {}).get("title_key", "")
+	if key != "" and I18n:
+		return I18n.t(key)
+	return ""
 
 func get_chapter_skill_requirements(chapter_id: String) -> Dictionary:
 	return _chapter_defs.get(chapter_id, {}).get("skill_requirements", {})
@@ -142,7 +150,7 @@ func get_chapter_status_text() -> String:
 	if worst_grade == "S":
 		return ""
 	
-	return "评级不达标: 需要达到%s级，最低评级为%s级" % [min_g, worst_grade]
+	return I18n.t("grade_below_requirement") + ": " + (I18n.t("grade_need_above") % [min_g, worst_grade])
 
 func reset_patient_progress(patient_id: String):
 	completed_sessions[patient_id] = 0
@@ -210,7 +218,7 @@ func check_chapter_completion() -> bool:
 				worst_g = g
 		if _last_failed_chapter != current_chapter:
 			_last_failed_chapter = current_chapter
-			chapter_failed.emit(current_chapter, "需要%s级以上，有治疗评级为%s级" % [min_g, worst_g])
+			chapter_failed.emit(current_chapter, I18n.t("grade_requirement") % [min_g, worst_g])
 		return false
 	
 	_last_failed_chapter = ""
@@ -359,7 +367,7 @@ func get_patient_emotion_summary(patient_id: String) -> String:
 	for cat in states:
 		result += "%s:%s " % [cat, states[cat]]
 	if result == "":
-		result = "初始评估中"
+		result = I18n.t("state_initial_assess")
 	return result
 
 func assign_homework(patient_id: String, task: String, detail: String):

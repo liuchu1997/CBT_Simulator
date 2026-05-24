@@ -9,19 +9,19 @@ var _queue: Array[Dictionary] = []
 var _tween: Tween = null
 
 var _achievement_defs := {
-	"first_session": {"title": "初次问诊", "desc": "完成第一次治疗", "icon": "*"},
-	"five_sessions": {"title": "经验丰富", "desc": "完成5次治疗", "icon": "**"},
-	"perfect_score": {"title": "完美治疗", "desc": "获得S级评分", "icon": "***"},
-	"cognitive_master": {"title": "认知大师", "desc": "认知重构满级", "icon": "***"},
-	"behavioral_master": {"title": "行为专家", "desc": "行为激活满级", "icon": "***"},
-	"empathic_master": {"title": "共情之师", "desc": "共情倾听满级", "icon": "***"},
-	"all_skills_max": {"title": "全能治疗师", "desc": "所有技能满级", "icon": "****"},
-	"trust_50": {"title": "获得信任", "desc": "患者信任达到50", "icon": "*"},
-	"trust_80": {"title": "深度联结", "desc": "患者信任达到80", "icon": "**"},
-	"first_resilient": {"title": "一线希望", "desc": "帮助患者达到恢复状态", "icon": "**"},
-	"breakthrough": {"title": "突破", "desc": "患者恢复且信任>60", "icon": "***"},
-	"unlock_zhang": {"title": "新患者", "desc": "解锁张浩", "icon": "*"},
-	"unlock_wang_mei": {"title": "更多患者", "desc": "解锁王美", "icon": "**"},
+	"first_session": {"title": I18n.t("ach_first_session"), "desc": I18n.t("ach_first_session_d"), "icon": "*"},
+	"five_sessions": {"title": I18n.t("ach_five_sessions"), "desc": I18n.t("ach_five_sessions_d"), "icon": "**"},
+	"perfect_score": {"title": I18n.t("ach_perfect"), "desc": I18n.t("ach_perfect_d"), "icon": "***"},
+	"cognitive_master": {"title": I18n.t("ach_cognitive"), "desc": I18n.t("ach_cognitive_d"), "icon": "***"},
+	"behavioral_master": {"title": I18n.t("ach_behavioral"), "desc": I18n.t("ach_behavioral_d"), "icon": "***"},
+	"empathic_master": {"title": I18n.t("ach_empathic"), "desc": I18n.t("ach_empathic_d"), "icon": "***"},
+	"all_skills_max": {"title": I18n.t("ach_all_master"), "desc": I18n.t("ach_all_master_d"), "icon": "****"},
+	"trust_50": {"title": I18n.t("ach_trust_50"), "desc": I18n.t("ach_trust_50_d"), "icon": "*"},
+	"trust_80": {"title": I18n.t("ach_trust_80"), "desc": I18n.t("ach_trust_80_d"), "icon": "**"},
+	"first_resilient": {"title": I18n.t("ach_resilient"), "desc": I18n.t("ach_resilient_d"), "icon": "**"},
+	"breakthrough": {"title": I18n.t("ach_breakthrough"), "desc": I18n.t("ach_breakthrough_d"), "icon": "***"},
+	"unlock_zhang": {"title": I18n.t("ach_unlock_zhang"), "desc": I18n.t("ach_unlock_zhang_d"), "icon": "*"},
+	"unlock_wang_mei": {"title": I18n.t("ach_unlock_wang"), "desc": I18n.t("ach_unlock_wang_d"), "icon": "**"},
 }
 
 func _ready():
@@ -32,7 +32,7 @@ func _ready():
 func _on_achievement(achievement_id: String):
 	var def: Dictionary = _achievement_defs.get(achievement_id, {})
 	if def.is_empty():
-		def = {"title": achievement_id, "desc": "成就解锁！", "icon": "*"}
+		def = {"title": achievement_id, "desc": I18n.t("achievement_unlocked"), "icon": "*"}
 	_queue.append(def)
 	if not visible:
 		_show_next()
@@ -43,7 +43,7 @@ func _show_next():
 		return
 	var def: Dictionary = _queue.pop_front()
 	icon_label.text = def.get("icon", "*")
-	title_label.text = "成就解锁: %s" % def.get("title", "")
+	title_label.text = "%s: %s" % [I18n.t("achievement_unlocked"), def.get("title", "")]
 	desc_label.text = def.get("desc", "")
 	visible = true
 	

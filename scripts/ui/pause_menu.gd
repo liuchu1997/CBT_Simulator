@@ -51,9 +51,9 @@ func _on_main_menu():
 
 func _on_save():
 	GameManager.save_game()
-	save_btn.text = "已保存!"
+	save_btn.text = I18n.t("saved")
 	await get_tree().create_timer(1.0).timeout
-	save_btn.text = "保存游戏"
+	save_btn.text = I18n.t("save_game")
 
 func _on_reset():
 	if _reset_pending:

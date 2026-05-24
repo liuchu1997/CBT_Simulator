@@ -4,16 +4,16 @@ signal skill_upgraded(skill_line: String, new_level: int)
 
 var _skill_data: Dictionary = {
 	"cognitive": {
-		"name": "认知重构",
-		"levels": ["辨识扭曲", "苏格拉底提问", "认知重构", "思维记录"],
+		"name_key": "skill_cognitive",
+		"level_keys": ["skill_identify_distortion", "skill_socratic", "skill_thought_record", "skill_cognitive"],
 	},
 	"behavioral": {
-		"name": "行为激活",
-		"levels": ["活动安排", "暴露疗法", "行为实验", "正念行动"],
+		"name_key": "skill_behavioral",
+		"level_keys": ["skill_activity_schedule", "skill_exposure", "skill_behavior_exp", "skill_mindfulness"],
 	},
 	"empathic": {
-		"name": "共情倾听",
-		"levels": ["积极倾听", "情感反映", "无条件接纳", "治疗联盟"],
+		"name_key": "skill_empathic",
+		"level_keys": ["skill_active_listening", "skill_emotion_reflect", "skill_unconditional", "skill_alliance"],
 	},
 }
 
@@ -36,12 +36,17 @@ func get_skill_level(skill_line: String) -> int:
 	return GameManager.skills.get(skill_line, 0)
 
 func get_skill_name(skill_line: String) -> String:
-	return _skill_data.get(skill_line, {}).get("name", skill_line)
+	var key: String = _skill_data.get(skill_line, {}).get("name_key", "")
+	if key != "" and I18n:
+		return I18n.t(key)
+	return skill_line
 
 func get_level_name(skill_line: String, level: int) -> String:
-	var levels: Array = _skill_data.get(skill_line, {}).get("levels", [])
-	if level > 0 and level <= levels.size():
-		return levels[level - 1]
+	var level_keys: Array = _skill_data.get(skill_line, {}).get("level_keys", [])
+	if level > 0 and level <= level_keys.size():
+		var key: String = level_keys[level - 1]
+		if I18n:
+			return I18n.t(key)
 	return ""
 
 func get_all_lines() -> Array[String]:

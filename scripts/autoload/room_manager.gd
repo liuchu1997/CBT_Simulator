@@ -5,34 +5,34 @@ signal room_changed(room_id: String)
 var _current_room: String = "lobby"
 var _room_configs: Dictionary = {
 	"lobby": {
-		"name": "大厅",
+		"name_key": "room_lobby",
 		"bg_color": Color(0.15, 0.15, 0.2),
 		"floor_tile": Vector2i(0, 0),
 		"wall_tile": Vector2i(0, 1),
 	},
 	"room_anxiety": {
-		"name": "焦虑系诊室",
+		"name_key": "room_anxiety",
 		"bg_color": Color(0.2, 0.15, 0.12),
 		"floor_tile": Vector2i(4, 0),
 		"wall_tile": Vector2i(2, 1),
 		"patient_id": "zhang_hao",
 	},
 	"room_depression": {
-		"name": "抑郁系诊室",
+		"name_key": "room_depression",
 		"bg_color": Color(0.12, 0.12, 0.2),
 		"floor_tile": Vector2i(3, 0),
 		"wall_tile": Vector2i(2, 1),
 		"patient_id": "lin_xiaoyu",
 	},
 	"room_personality": {
-		"name": "人格系诊室",
+		"name_key": "room_personality",
 		"bg_color": Color(0.18, 0.12, 0.18),
 		"floor_tile": Vector2i(4, 0),
 		"wall_tile": Vector2i(0, 1),
 		"patient_id": "wang_mei",
 	},
 	"room_crisis": {
-		"name": "危机干预室",
+		"name_key": "room_crisis",
 		"bg_color": Color(0.2, 0.1, 0.1),
 		"floor_tile": Vector2i(3, 0),
 		"wall_tile": Vector2i(0, 1),
@@ -81,4 +81,7 @@ func return_to_lobby():
 	change_room("lobby")
 
 func get_room_name(room_id: String) -> String:
-	return _room_configs.get(room_id, {}).get("name", "未知")
+	var key: String = _room_configs.get(room_id, {}).get("name_key", "state_unknown")
+	if I18n:
+		return I18n.t(key)
+	return room_id

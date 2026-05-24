@@ -82,12 +82,12 @@ func _build_stat_bars():
 	_stat_bars.clear()
 	
 	var stat_config := [
-		{"key": "anxiety", "name": "焦虑", "color": Color(1.0, 0.5, 0.2)},
-		{"key": "depression", "name": "抑郁", "color": Color(0.4, 0.4, 0.8)},
-		{"key": "defensiveness", "name": "防御", "color": Color(0.8, 0.3, 0.3)},
-		{"key": "insight", "name": "洞察", "color": Color(0.3, 0.9, 0.5)},
-		{"key": "avoidance", "name": "回避", "color": Color(0.7, 0.7, 0.3)},
-		{"key": "hope", "name": "希望", "color": Color(1.0, 0.9, 0.3)},
+		{"key": "anxiety", "name": I18n.t("emotion_anxiety"), "color": Color(1.0, 0.5, 0.2)},
+		{"key": "depression", "name": I18n.t("emotion_depression"), "color": Color(0.4, 0.4, 0.8)},
+		{"key": "defensiveness", "name": I18n.t("battle_defense"), "color": Color(0.8, 0.3, 0.3)},
+		{"key": "insight", "name": I18n.t("battle_insight"), "color": Color(0.3, 0.9, 0.5)},
+		{"key": "avoidance", "name": I18n.t("battle_avoidance"), "color": Color(0.7, 0.7, 0.3)},
+		{"key": "hope", "name": I18n.t("emotion_hope"), "color": Color(1.0, 0.9, 0.3)},
 	]
 	
 	for cfg in stat_config:
@@ -129,7 +129,7 @@ func _on_state_changed(pid: String, _new_state: String):
 func _on_battle_effect(pid: String, _skill: String, eff_label: String, delta_text: String):
 	if pid != _current_patient_id:
 		return
-	_effect_label.text = "%s (alliance %s)" % [eff_label, delta_text]
+	_effect_label.text = "%s (%s %s)" % [eff_label, I18n.t("battle_alliance"), delta_text]
 	_effect_label.add_theme_color_override("font_color", _eff_color(eff_label))
 	_effect_label.visible = true
 	if _effect_tween:
@@ -142,7 +142,7 @@ func _on_battle_effect(pid: String, _skill: String, eff_label: String, delta_tex
 func _on_schema_discovered(pid: String, schema: String):
 	if pid != _current_patient_id:
 		return
-	_schema_label.text = "[发现隐藏信念] %s" % schema
+	_schema_label.text = "%s: %s" % [I18n.t("battle_schema_discovered"), schema]
 	_schema_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.0))
 	_schema_label.visible = true
 	if _schema_tween:
@@ -163,11 +163,11 @@ func _state_color(state: int) -> Color:
 		_: return Color.WHITE
 
 func _eff_color(label: String) -> Color:
-	if "拔群" in label: return Color(0.2, 1.0, 0.4)
-	if "很有效" in label: return Color(0.4, 0.9, 0.5)
-	if "一般" in label: return Color(0.8, 0.8, 0.8)
-	if "不佳" in label: return Color(1.0, 0.5, 0.2)
-	if "无效" in label: return Color(1.0, 0.2, 0.2)
+	if label == I18n.t("effectiveness_super"): return Color(0.2, 1.0, 0.4)
+	if label == I18n.t("effectiveness_great"): return Color(0.4, 0.9, 0.5)
+	if label == I18n.t("effectiveness_normal"): return Color(0.8, 0.8, 0.8)
+	if label == I18n.t("effectiveness_weak"): return Color(1.0, 0.5, 0.2)
+	if label == I18n.t("effectiveness_none"): return Color(1.0, 0.2, 0.2)
 	return Color.WHITE
 
 func _get_patient_display_name(pid: String) -> String:

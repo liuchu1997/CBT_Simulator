@@ -39,26 +39,26 @@ func show_profile(patient: Node):
 	visible = true
 	
 	var p_id: String = patient.get("patient_id") if patient.get("patient_id") else ""
-	var p_name: String = patient.get("npc_name") if patient.get("npc_name") else "未知"
+	var p_name: String = patient.get("npc_name") if patient.get("npc_name") else I18n.t("profile_name")
 	
-	name_label.text = "患者: %s" % p_name
+	name_label.text = "%s: %s" % [I18n.t("score_patient"), p_name]
 	
 	var diagnoses := {
-		"lin_xiaoyu": "中度抑郁",
-		"zhang_hao": "广泛性焦虑",
-		"wang_mei": "社交焦虑",
+		"lin_xiaoyu": I18n.t("diagnosis_depression"),
+		"zhang_hao": I18n.t("diagnosis_gad"),
+		"wang_mei": I18n.t("diagnosis_social_anxiety"),
 	}
-	diag_label.text = "诊断: %s" % diagnoses.get(p_id, "评估中")
+	diag_label.text = "%s: %s" % [I18n.t("profile_diagnosis"), diagnoses.get(p_id, "-")]
 	
 	for child in emotion_container.get_children():
 		child.queue_free()
 	
 	var emotion_names := {
-		"depression": "抑郁",
-		"anxiety": "焦虑",
-		"anger": "愤怒",
-		"hope": "希望",
-		"trust": "信任度",
+		"depression": I18n.t("emotion_depression"),
+		"anxiety": I18n.t("emotion_anxiety"),
+		"anger": I18n.t("emotion_anger"),
+		"hope": I18n.t("emotion_hope"),
+		"trust": I18n.t("profile_trust"),
 	}
 	
 	if patient.get("emotion"):
@@ -86,13 +86,13 @@ func show_profile(patient: Node):
 	
 	if patient.get("cognitive_distortions"):
 		var dist: Array = patient.cognitive_distortions
-		distortions_label.text = "、".join(dist)
+		distortions_label.text = ", ".join(dist)
 	else:
-		distortions_label.text = "暂无"
+		distortions_label.text = I18n.t("journal_empty")
 	
 	var progress := GameManager.get_patient_progress(p_id)
 	var max_s: int = patient.get("max_sessions") if patient.get("max_sessions") else 5
-	session_label.text = "已完成 %d / %d 次会话" % [progress, max_s]
+	session_label.text = I18n.t("profile_records") % [progress, max_s]
 	close_btn.grab_focus()
 
 func _input(event: InputEvent):

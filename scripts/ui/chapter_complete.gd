@@ -20,34 +20,34 @@ func show_chapter_complete():
 	for ch in GameManager.completed_chapters:
 		chapter_id = ch
 	var def: Dictionary = GameManager.get_chapter_def(chapter_id)
-	var title: String = def.get("title", "章节完成")
+	var title: String = def.get("title", I18n.t("chapter_complete"))
 	var pid: String = def.get("patient_id", "")
 	
 	chapter_title.text = title
-	subtitle.text = "章节完成！"
+	subtitle.text = I18n.t("chapter_complete")
 	
 	for child in stats.get_children():
 		child.queue_free()
 	
-	var patient_names := {"lin_xiaoyu": "林小雨", "zhang_hao": "张浩", "wang_mei": "王美"}
+	var patient_names := {"lin_xiaoyu": I18n.t("patient_lin_xiaoyu"), "zhang_hao": I18n.t("patient_zhang_hao"), "wang_mei": I18n.t("patient_wang_mei")}
 	var pname: String = patient_names.get(pid, pid)
 	
 	var sessions_done: int = GameManager.completed_sessions.get(pid, 0)
-	_add_stat("治疗次数: %d" % sessions_done)
-	_add_stat("信任值: %d/100" % GameManager.get_bond(pid))
-	_add_stat("技能点: +%d" % sessions_done)
-	_add_stat("总分: %d" % GameManager.total_score)
+	_add_stat(I18n.t("journal_count") % sessions_done)
+	_add_stat("%s: %d/100" % [I18n.t("profile_trust"), GameManager.get_bond(pid)])
+	_add_stat("%s: +%d" % [I18n.t("skill_points_label"), sessions_done])
+	_add_stat("%s: %d" % [I18n.t("score_total"), GameManager.total_score])
 	
 	var scores: Array = GameManager.patient_scores.get(pid, [])
 	var grade_text := ""
 	for s_data in scores:
 		grade_text += "%s " % s_data.get("grade", "D")
 	if grade_text != "":
-		_add_stat("各次评级: %s" % grade_text)
+		_add_stat("%s: %s" % [I18n.t("score_grade"), grade_text])
 	
 	var emotion_summary: String = GameManager.get_patient_emotion_summary(pid)
-	if emotion_summary != "初始评估中":
-		_add_stat("情绪状态: %s" % emotion_summary)
+	if emotion_summary != I18n.t("state_active"):
+		_add_stat("%s: %s" % [I18n.t("score_emotion_state"), emotion_summary])
 	
 	var next_chapter: String = def.get("unlock_next", "")
 	if next_chapter != "":
@@ -56,11 +56,11 @@ func show_chapter_complete():
 		var reqs: String = GameManager.get_missing_skills_text(next_chapter)
 		var next_min: String = next_def.get("min_grade", "D")
 		if reqs == "":
-			unlock_label.text = "[color=green]下一章已解锁: %s[/color]\n[color=white]评级要求: %s级以上[/color]" % [next_title, next_min]
+			unlock_label.text = "[color=green]%s: %s[/color]\n[color=white]%s: %s[/color]" % [I18n.t("chapter_unlock_next"), next_title, I18n.t("score_grade"), next_min]
 		else:
-			unlock_label.text = "[color=yellow]下一章: %s[/color]\n[color=white]评级要求: %s级以上\n需要提升技能:\n%s\n按K键打开技能树[/color]" % [next_title, next_min, reqs]
+			unlock_label.text = "[color=yellow]%s: %s[/color]\n[color=white]%s: %s\n%s:\n%s\n%s[/color]" % [I18n.t("chapter_unlock_next"), next_title, I18n.t("score_grade"), next_min, I18n.t("skill_upgrade"), reqs, I18n.t("task_hotkeys")]
 	else:
-		unlock_label.text = "[color=gold]恭喜！你已完成所有章节！[/color]\n[color=white]你已经成为了一名合格的CBT治疗师！[/color]"
+		unlock_label.text = "[color=gold]%s[/color]\n[color=white]%s[/color]" % [I18n.t("congratulations"), I18n.t("chapter_complete")]
 	
 	continue_btn.grab_focus()
 

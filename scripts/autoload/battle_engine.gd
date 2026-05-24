@@ -16,13 +16,13 @@ enum EmotionState {
 }
 
 var _state_names: Dictionary = {
-	EmotionState.GUARDED: "防御",
-	EmotionState.TESTING: "试探",
-	EmotionState.OPENING_UP: "敞开心扉",
-	EmotionState.EMOTIONALLY_FLOODED: "情绪泛滥",
-	EmotionState.RESISTANT: "抗拒",
-	EmotionState.REFLECTIVE: "反思",
-	EmotionState.INSIGHT: "领悟",
+	EmotionState.GUARDED: "state_guarded",
+	EmotionState.TESTING: "state_probing",
+	EmotionState.OPENING_UP: "state_opening_up",
+	EmotionState.EMOTIONALLY_FLOODED: "state_flooded",
+	EmotionState.RESISTANT: "state_resistant",
+	EmotionState.REFLECTIVE: "state_reflecting",
+	EmotionState.INSIGHT: "state_insight",
 }
 
 var _patient_data: Dictionary = {}
@@ -125,7 +125,10 @@ func get_state(patient_id: String) -> int:
 	return _patient_data[patient_id]["emotional_state"]
 
 func get_state_name(patient_id: String) -> String:
-	return _state_names.get(get_state(patient_id), "未知")
+	var key: String = _state_names.get(get_state(patient_id), "state_unknown")
+	if I18n:
+		return I18n.t(key)
+	return "Unknown"
 
 func get_alliance(patient_id: String) -> int:
 	if not _patient_data.has(patient_id):
@@ -154,7 +157,7 @@ func get_turn_count(patient_id: String) -> int:
 
 func apply_skill(patient_id: String, category: String, base_points: int) -> Dictionary:
 	if not _patient_data.has(patient_id):
-		return _make_result(base_points, "neutral", "无状态", 0, 0)
+		return _make_result(base_points, "neutral", "state_no_state", 0, 0)
 	
 	var data: Dictionary = _patient_data[patient_id]
 	var state: int = data["emotional_state"]
@@ -190,7 +193,7 @@ func apply_skill(patient_id: String, category: String, base_points: int) -> Dict
 	alliance_changed.emit(patient_id, data["alliance"])
 	battle_effect.emit(patient_id, skill_name, eff_label, delta_text)
 	
-	return _make_result(actual_points, eff_label, _state_names.get(state, "?"), alliance_delta, data["emotional_state"])
+	return _make_result(actual_points, eff_label, _state_names.get(state, "state_unknown"), alliance_delta, data["emotional_state"])
 
 func _calc_alliance_delta(eff: float, base_points: int) -> int:
 	if base_points <= 0:
@@ -268,7 +271,7 @@ func _check_state_transition(patient_id: String, data: Dictionary, eff: float, b
 	if new_state != old_state:
 		data["emotional_state"] = new_state
 		data["state_history"].append({"from": old_state, "to": new_state, "turn": data["turn_count"]})
-		state_changed.emit(patient_id, _state_names.get(new_state, "?"))
+		state_changed.emit(patient_id, I18n.t(_state_names.get(new_state, "state_unknown")))
 
 func category_is_emotional(cat: String) -> bool:
 	return cat in ["empathy", "validation", "reflection"]
@@ -290,14 +293,14 @@ func _check_schema_discovery(patient_id: String, data: Dictionary, eff: float):
 
 func _get_effectiveness_label(eff: float) -> String:
 	if eff >= 3.0:
-		return "效果拔群！"
+		return I18n.t("effectiveness_super") if I18n else "Super Effective!"
 	if eff >= 2.0:
-		return "很有效！"
+		return I18n.t("effectiveness_great") if I18n else "Very Effective!"
 	if eff >= 1.0:
-		return "一般..."
+		return I18n.t("effectiveness_normal") if I18n else "Normal..."
 	if eff >= 0.5:
-		return "效果不佳..."
-	return "完全无效！"
+		return I18n.t("effectiveness_weak") if I18n else "Not Very Effective..."
+	return I18n.t("effectiveness_none") if I18n else "No Effect!"
 
 func _make_result(points: int, eff_label: String, state_name: String, alliance_delta: int, new_state: int) -> Dictionary:
 	return {

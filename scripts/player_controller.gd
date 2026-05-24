@@ -43,6 +43,14 @@ func _get_input():
 		dir = Vector2.RIGHT
 		facing = "right"
 	
+	var touch := _get_touch_dir()
+	if touch != Vector2.ZERO and dir == Vector2.ZERO:
+		dir = touch
+		if absf(dir.x) > absf(dir.y):
+			facing = "right" if dir.x > 0 else "left"
+		else:
+			facing = "down" if dir.y > 0 else "up"
+	
 	if dir != Vector2.ZERO:
 		interact_ray.target_position = dir * tile_size
 		interact_ray.force_raycast_update()
@@ -53,6 +61,15 @@ func _get_input():
 			sprite.play("walk_" + facing)
 		else:
 			sprite.play("idle_" + facing)
+
+func _get_touch_dir() -> Vector2:
+	var touch_nodes := get_tree().get_nodes_in_group("touch_controls")
+	if touch_nodes.is_empty():
+		return Vector2.ZERO
+	var tc: Node = touch_nodes[0]
+	if tc.has_method("get_move_direction"):
+		return tc.get_move_direction()
+	return Vector2.ZERO
 
 func _move_to_target():
 	var to_target := target_position - global_position
